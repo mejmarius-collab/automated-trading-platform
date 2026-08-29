@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal &amp; Disclaimer — Aurora XAU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080806; --bg2: #0e0d0a; --bg3: #141210;
+  --gold: #c9a84c; --gold2: #e8c96a; --gold3: #f5e0a0; --gold-dim: #6b5a2a;
+  --text: #e8e2d0; --muted: #7a7060; --line: rgba(201,168,76,0.12); --line2: rgba(201,168,76,0.22);
+  --head: 'Lora', serif; --body: 'Outfit', sans-serif;
+}
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body { background: var(--bg); color: var(--text); font-family: var(--body); font-size: 16px; line-height: 1.7; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 20px 60px; display: flex; justify-content: space-between; align-items: center;
+  background: rgba(8,8,6,0.95); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+}
+.logo { font-family: var(--head); font-size: 22px; font-weight: 600; letter-spacing: 6px; color: var(--gold2); text-transform: uppercase; text-decoration: none; }
+.back-link { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+.back-link:hover { color: var(--gold2); }
+
+.page-wrap { max-width: 860px; margin: 0 auto; padding: 120px 40px 80px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; border: 1px solid var(--line); margin-bottom: 56px; overflow: hidden; }
+.tab-btn {
+  flex: 1; padding: 14px 8px; background: none; border: none; border-right: 1px solid var(--line);
+  font-family: var(--body); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); cursor: pointer; transition: all 0.2s;
+}
+.tab-btn:last-child { border-right: none; }
+.tab-btn.active { background: rgba(201,168,76,0.1); color: var(--gold2); }
+.tab-btn:hover:not(.active) { color: var(--text); background: rgba(255,255,255,0.02); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Doc styles */
+.doc-header { margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--line); }
+.doc-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+.doc-title { font-family: var(--head); font-size: clamp(36px, 5vw, 56px); font-weight: 300; color: var(--text); margin-bottom: 12px; line-height: 1.1; }
+.doc-meta { font-size: 13px; color: var(--muted); }
+
+.warning-box {
+  background: rgba(255,77,77,0.06); border: 1px solid rgba(255,77,77,0.2);
+  padding: 20px 24px; margin-bottom: 40px;
+  font-size: 14px; color: #ffaaaa; line-height: 1.7; font-weight: 300;
+}
+.warning-box strong { color: #ff7070; font-weight: 500; }
+
+h3 {
+  font-family: var(--head); font-size: 24px; font-weight: 400;
+  color: var(--gold2); margin: 40px 0 16px; letter-spacing: 0.3px;
+}
+h3:first-of-type { margin-top: 0; }
+
+p { font-size: 15px; font-weight: 300; color: var(--muted); margin-bottom: 16px; line-height: 1.8; }
+p strong { color: var(--text); font-weight: 500; }
+
+ul { margin: 0 0 20px 0; padding: 0; list-style: none; }
+ul li {
+  font-size: 14px; font-weight: 300; color: var(--muted);
+  padding: 8px 0 8px 20px; border-bottom: 1px solid rgba(201,168,76,0.05);
+  position: relative; line-height: 1.7;
+}
+ul li::before { content: '—'; position: absolute; left: 0; color: var(--gold-dim); }
+ul li:last-child { border-bottom: none; }
+
+.section-divider { height: 1px; background: var(--line); margin: 40px 0; }
+
+.highlight-box {
+  background: rgba(201,168,76,0.05); border: 1px solid var(--line2);
+  padding: 20px 24px; margin: 24px 0;
+  font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.8;
+}
+.highlight-box strong { color: var(--gold2); font-weight: 400; }
+
+.contact-block {
+  background: var(--bg2); border: 1px solid var(--line);
+  padding: 28px 32px; margin-top: 48px;
+}
+.contact-block p { margin-bottom: 8px; }
+.contact-block a { color: var(--gold); text-decoration: none; }
+.contact-block a:hover { color: var(--gold2); }
+
+footer {
+  border-top: 1px solid var(--line); padding: 40px 60px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px; margin-top: 80px;
+}
+.footer-logo { font-family: var(--head); font-size: 18px; letter-spacing: 6px; color: var(--gold2); text-transform: uppercase; }
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-links a { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: var(--gold); }
+
+@media (max-width: 768px) {
+  nav { padding: 16px 20px; }
+  .page-wrap { padding: 90px 20px 60px; }
+  .tabs { flex-direction: column; }
+  .tab-btn { border-right: none; border-bottom: 1px solid var(--line); text-align: left; padding: 14px 20px; }
+  .tab-btn:last-child { border-bottom: none; }
+  footer { padding: 32px 20px; flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Aurora <span style="font-size:14px;letter-spacing:3px;color:var(--gold-dim)">XAU</span></a>
+  <a href="index.html" class="back-link">← Back</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('disclaimer')">Portfolio Disclaimer</button>
+    <button class="tab-btn" onclick="showTab('privacy')">Privacy</button>
+    <button class="tab-btn" onclick="showTab('risk')">Risk Notice</button>
+  </div>
+
+  <!-- TAB: PORTFOLIO DISCLAIMER -->
+  <div class="tab-panel active" id="tab-disclaimer">
+    <div class="doc-header">
+      <div class="doc-eyebrow">Legal</div>
+      <h1 class="doc-title">Portfolio Disclaimer</h1>
+      <p class="doc-meta">Effective: 2026 — Aurora XAU Demo</p>
+    </div>
+
+    <div class="warning-box">
+      <strong>This is a portfolio/demonstration project.</strong> Aurora XAU is not a registered financial service, broker, or investment platform. No real trading services, subscriptions, or financial products are offered through this repository.
+    </div>
+
+    <h3>Purpose</h3>
+    <p>This repository is a <strong>software portfolio project</strong> created to demonstrate full-stack engineering skills including Node.js backend development, automated trading integrations (MetaAPI, CopyFactory), Stripe payment flows, AI-assisted strategy pipelines, and real-time dashboards.</p>
+    <p>All trade data displayed on this site is <strong>synthetic and generated for demonstration purposes only</strong>. It does not represent real account performance, real executed trades, or any actual financial results.</p>
+
+    <h3>No Services Offered</h3>
+    <ul>
+      <li>No subscription payments are processed — Stripe integration is in demo mode</li>
+      <li>No broker accounts are connected — MetaAPI/CopyFactory calls are disabled</li>
+      <li>No live trades are executed — all execution paths are blocked at runtime</li>
+      <li>No financial advice is given — nothing here should be construed as investment guidance</li>
+    </ul>
+
+    <h3>Intellectual Property</h3>
+    <p>Source code is shared under the MIT License for portfolio and educational purposes. Third-party service names (MetaAPI, CopyFactory, Stripe, Supabase, Anthropic) are trademarks of their respective owners. Use of their names here is for descriptive purposes only.</p>
+
+    <div class="highlight-box">
+      <strong>Interested in the architecture or implementation?</strong> See the README for a full technical overview, or open an issue on GitHub with questions.
+    </div>
+  </div>
+
+  <!-- TAB: PRIVACY -->
+  <div class="tab-panel" id="tab-privacy">
+    <div class="doc-header">
+      <div class="doc-eyebrow">Privacy</div>
+      <h1 class="doc-title">Privacy Notice</h1>
+      <p class="doc-meta">Effective: 2026 — Aurora XAU Demo</p>
+    </div>
+
+    <h3>No Personal Data Collected</h3>
+    <p>This demo site does <strong>not collect, store, or process personal data</strong>. There are no sign-up forms, login flows, or user accounts active in this portfolio version.</p>
+
+    <h3>No Analytics</h3>
+    <p>No third-party analytics, tracking pixels, or advertising scripts are loaded on this site. No cookies are set beyond what is required for the page to function locally in your browser.</p>
+
+    <h3>No Payments</h3>
+    <p>The Stripe checkout integration is present in the source code for demonstration purposes. <strong>No payment forms are active</strong> in this demo — clicking subscribe-style buttons will not initiate any real payment flow.</p>
+
+    <h3>Hosting</h3>
+    <p>This site may be hosted on a static hosting provider (Netlify, GitHub Pages, or similar). That provider's own privacy policy applies to standard server logs (IP address, access times). No application-level user data is transmitted to the backend.</p>
+
+    <div class="highlight-box">
+      <strong>Questions?</strong> Open an issue on GitHub. This is a portfolio project — there is no support team or data protection officer.
+    </div>
+  </div>
+
+  <!-- TAB: RISK NOTICE -->
+  <div class="tab-panel" id="tab-risk">
+    <div class="doc-header">
+      <div class="doc-eyebrow">Risk</div>
+      <h1 class="doc-title">Risk Notice</h1>
+      <p class="doc-meta">Effective: 2026 — Aurora XAU Demo</p>
+    </div>
+
+    <div class="warning-box">
+      <strong>Trading foreign exchange and commodities involves substantial risk of loss.</strong> This notice applies to anyone who reads this project and considers implementing similar automated trading systems.
+    </div>
+
+    <h3>No Real Trading Activity</h3>
+    <p>The strategies, signals, and trade history shown in this demo are <strong>fictional</strong>. They are generated for portfolio demonstration only and do not represent live or past real-money trading performance.</p>
+
+    <h3>Automated Systems Carry Additional Risk</h3>
+    <ul>
+      <li>Automated systems can execute trades faster than a human can intervene</li>
+      <li>Connectivity failures, API outages, or bugs can cause unintended orders</li>
+      <li>Backtested or simulated results do not guarantee future performance</li>
+      <li>Leverage amplifies both gains and losses — accounts can lose more than deposited</li>
+    </ul>
+
+    <h3>Not Financial Advice</h3>
+    <p>Nothing in this repository — including source code, comments, README content, or displayed trade data — constitutes financial advice, investment recommendations, or a solicitation to trade. If you intend to use automated trading systems with real money, consult a qualified financial professional and ensure compliance with regulations in your jurisdiction.</p>
+
+    <h3>Open Source Disclaimer</h3>
+    <p>This code is provided as-is under the MIT License. The author accepts no liability for losses arising from use or adaptation of this software in live trading environments.</p>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<footer>
+  <span class="footer-logo">Aurora <span style="font-size:13px;letter-spacing:3px;color:var(--gold-dim)">XAU</span></span>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="legal.html">Legal</a>
+  </div>
+</footer>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  document.querySelectorAll('.tab-btn')[['disclaimer','privacy','risk'].indexOf(id)].classList.add('active');
+}
+</script>
+</body>
+</html>

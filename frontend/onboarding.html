@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<!-- PORTFOLIO/DEMO VERSION — No real credentials or live trading -->
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurora FX Gold — Onboarding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-bg: #FDF8EC;
+      --gold-border: #E5D08A;
+      --gold-dark: #A8892E;
+      --green: #22C55E;
+      --green-bg: #DCFCE7;
+      --green-border: #86EFAC;
+      --green-text: #15803D;
+      --red-bg: #FEF2F2;
+      --red-border: #FECACA;
+      --red-text: #DC2626;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-300: #D1D5DB;
+      --gray-400: #9CA3AF;
+      --gray-500: #6B7280;
+      --gray-600: #4B5563;
+      --gray-700: #374151;
+      --gray-900: #111827;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #fff;
+      color: var(--gray-900);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #fff;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      background: var(--gold);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--gray-900);
+      letter-spacing: -0.01em;
+    }
+
+    .logo-name em {
+      font-style: normal;
+      color: var(--gold);
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: var(--gray-100);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .lang-btn {
+      padding: 5px 14px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--gray-500);
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+      line-height: 1.4;
+    }
+
+    .lang-btn.active {
+      background: #fff;
+      color: var(--gray-900);
+      box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04);
+    }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 52px 20px 64px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .check-ring {
+      width: 72px;
+      height: 72px;
+      background: var(--green-bg);
+      border-radius: 50%;
+      border: 2px solid var(--green-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      font-size: 15px;
+      color: var(--gray-500);
+      line-height: 1.5;
+    }
+
+    /* ── Info box ── */
+    .info-box {
+      background: var(--gold-bg);
+      border: 1px solid var(--gold-border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: #5c4a1a;
+      margin-bottom: 24px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 24px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+      line-height: 1;
+    }
+
+    .btn:active:not(:disabled) { transform: scale(0.98); }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #fff;
+    }
+
+    .btn-gold:hover:not(:disabled) {
+      background: var(--gold-dark);
+      box-shadow: 0 4px 14px rgba(201,168,76,.35);
+    }
+
+    .btn-gold:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-w100 { width: 100%; }
+
+    /* ── Contact line ── */
+    .contact-line {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: var(--gray-400);
+    }
+
+    .contact-line a {
+      color: var(--gold-dark);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .contact-line a:hover { text-decoration: underline; }
+
+    /* ── Steps indicator ── */
+    .steps {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .step-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-400);
+      background: #fff;
+      transition: all 0.25s;
+    }
+
+    .step-dot.is-active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-bg);
+    }
+
+    .step-dot.is-done {
+      border-color: var(--green);
+      background: var(--green-bg);
+      color: var(--green-text);
+    }
+
+    .step-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--gray-400);
+      white-space: nowrap;
+    }
+
+    .step-name.is-active { color: var(--gold); }
+
+    .step-line {
+      flex: 1;
+      max-width: 80px;
+      min-width: 32px;
+      height: 2px;
+      background: var(--gray-200);
+      margin: 0 8px;
+      margin-top: 16px;
+      border-radius: 2px;
+      transition: background 0.25s;
+    }
+
+    .step-line.is-done { background: var(--green); }
+
+    /* ── Section ── */
+    .section-title {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--gray-900);
+      margin-bottom: 6px;
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: var(--gray-500);
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    /* ── Lot cards ── */
+    .lot-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .lot-card {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 18px;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      cursor: pointer;
+      background: #fff;
+      text-align: left;
+      transition: border-color 0.15s, background 0.15s;
+      outline: none;
+    }
+
+    .lot-card:hover {
+      border-color: var(--gold-border);
+      background: var(--gold-bg);
+    }
+
+    .lot-card:focus-visible {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,.2);
+    }
+
+    .lot-card.is-selected {
+      border-color: var(--gold);
+      background: var(--gold-bg);
+    }
+
+    .lot-radio {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.15s;
+    }
+
+    .lot-card.is-selected .lot-radio { border-color: var(--gold); }
+
+    .lot-radio-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      transform: scale(0);
+      transition: transform 0.15s;
+    }
+
+    .lot-card.is-selected .lot-radio-dot { transform: scale(1); }
+
+    .lot-text { flex: 1; }
+
+    .lot-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .lot-size {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .lot-hint {
+      font-size: 13px;
+      color: var(--gray-600);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* ── Form ── */
+    .form-field { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-600);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--gray-900);
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -moz-appearance: textfield;
+    }
+
+    .form-input::-webkit-outer-spin-button,
+    .form-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .form-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,.15);
+    }
+
+    .form-input::placeholder { color: var(--gray-300); }
+
+    .input-hint {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--gray-400);
+      line-height: 1.45;
+    }
+
+    /* ── Platform pills ── */
+    .platform-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .platform-pill {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+
+    .platform-pill:hover { border-color: var(--gold-border); }
+
+    .platform-pill.is-selected {
+      border-color: var(--gold);
+      background: var(--gold-bg);
+    }
+
+    .platform-pill input[type="radio"] { display: none; }
+
+    .plat-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.15s;
+    }
+
+    .platform-pill.is-selected .plat-dot { border-color: var(--gold); }
+
+    .plat-dot-inner {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      transform: scale(0);
+      transition: transform 0.15s;
+    }
+
+    .platform-pill.is-selected .plat-dot-inner { transform: scale(1); }
+
+    .plat-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .platform-pill.is-selected .plat-label { color: var(--gold-dark); }
+
+    /* ── Messages ── */
+    .msg-ok {
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      color: var(--green-text);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-top: 16px;
+      font-size: 15px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .msg-err {
+      background: var(--red-bg);
+      border: 1px solid var(--red-border);
+      color: var(--red-text);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      flex-shrink: 0;
+    }
+
+    /* ── Error state ── */
+    .err-state {
+      text-align: center;
+      padding: 64px 0;
+    }
+
+    .err-state h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .err-state p { font-size: 14px; color: var(--gray-500); }
+
+    .err-state a {
+      color: var(--gold-dark);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 20px 24px;
+      font-size: 13px;
+      color: var(--gray-400);
+      border-top: 1px solid var(--gray-100);
+    }
+
+    footer a { color: var(--gray-500); text-decoration: none; }
+    footer a:hover { color: var(--gold-dark); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.is-open { display: flex; }
+    .modal-box {
+      background: #fff;
+      border-radius: 14px;
+      padding: 24px;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+    .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; color: var(--gray-900); }
+    .modal-body { font-size: 14px; color: var(--gray-600); line-height: 1.7; white-space: pre-line; }
+    .modal-close-btn { margin-top: 20px; width: 100%; }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .topbar { padding: 12px 16px; }
+      main { padding: 36px 16px 48px; }
+      .page-title { font-size: 24px; }
+      .step-line { min-width: 24px; max-width: 48px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div style="background:#B45309;color:#fff;text-align:center;padding:10px 16px;font-size:13px;letter-spacing:.5px;">
+    ⚠️ <strong>Demo Mode</strong> — This form does not connect to a real broker. No trades will be placed.
+  </div>
+
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+          <path d="M8.5 1 L10.8 6.2 L16.5 6.5 L12.3 10.2 L13.8 16 L8.5 12.8 L3.2 16 L4.7 10.2 L0.5 6.5 L6.2 6.2 Z" fill="white"/>
+        </svg>
+      </div>
+      <span class="logo-name">Aurora FX <em>Gold</em></span>
+    </div>
+    <div class="lang-switcher">
+      <button class="lang-btn active" id="btn-lt" onclick="setLang('lt')">LT</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="container" id="app"></div>
+  </main>
+
+  <div id="tg-id-modal" class="modal-overlay" onclick="if(event.target===this)closeTgModal()">
+    <div class="modal-box">
+      <h3 class="modal-title" id="modal-title-text"></h3>
+      <p class="modal-body" id="modal-body-text"></p>
+      <button class="btn btn-gold modal-close-btn" id="modal-close-btn" onclick="closeTgModal()"></button>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Aurora FX Gold ·
+    <a href="https://aurora-demo.example.com" target="_blank" rel="noopener noreferrer">aurora-demo.example.com</a>
+  </footer>
+
+  <script>
+    // ─── Translations ──────────────────────────────────────────────────────────
+    const T = {
+      lt: {
+        paid: 'Mokėjimas gautas!',
+        auto: {
+          subtitle: 'Sveiki prisijungę prie Aurora FX Gold Automatinis plano',
+          s1Label: 'Lot dydis',
+          s2Label: 'MT4/MT5',
+          s1Title: 'Pasirinkite pozicijos dydį',
+          s1Desc: 'Lot dydis nustato kiek investuojate į kiekvieną sandorį',
+          l001h: 'Mažesnėms sąskaitoms, rekomenduojamas depozitas nuo $400',
+          l002h: 'Rekomenduojamas depozitas nuo $1,000',
+          l004h: 'Rekomenduojamas depozitas nuo $1,000',
+          l006h: 'Rekomenduojamas depozitas nuo $1,000',
+          l010h: 'Didesnėms sąskaitoms, rekomenduojamas depozitas nuo $2,000',
+          nextBtn: 'Tęsti →',
+          s2Title: 'Prijunkite savo MT4/MT5 sąskaitą',
+          s2Desc: 'Įveskite savo brokerio prisijungimo duomenis. Mes automatiškai vykdysime sandorius jūsų vardu.',
+          loginLbl: 'Sąskaitos numeris',
+          loginPh:  '12345678',
+          pwLbl:    'Slaptažodis',
+          pwPh:     '••••••••',
+          pwHint:   'Naudokite pagrindinį/prekybinį MT4/MT5 slaptažodį, ne investor/read-only slaptažodį. Investor slaptažodis netinka automatiniam kopijavimui.',
+          srvLbl:   'Serverio pavadinimas',
+          srvPh:    'ICMarkets-Live',
+          platLbl:  'Platforma',
+          connectBtn: 'Prijungti sąskaitą',
+          security: '🔒 Duomenys šifruojami ir saugomi saugiai. Mes niekada neparduosime jūsų duomenų.',
+          okMsg:  'Sąskaita sėkmingai prijungta! Jūsų sąskaita aktyvuota.',
+          errMsg: 'Klaida jungiantis prie sąskaitos. Patikrinkite duomenis ir bandykite dar kartą.',
+          loading: 'Jungiama…',
+          tgIdLbl: 'Telegram ID',
+          tgIdPh: 'pvz.: 123456789',
+          tgIdHint: 'Reikalinga, kad galėtumėte sustabdyti/aktyvuoti kopijavimą per Telegram botą (komandos /stop ir /start)',
+          tgUsernameLbl: 'Telegram username',
+          tgUsernamePh: 'pvz.: @tadas',
+          optionalLabel: 'nebūtina',
+          tgIdHelp: 'Kaip rasti savo Telegram ID?',
+          tgModalTitle: 'Kaip rasti savo Telegram ID?',
+          tgModalBody: '1. Atidarykite Telegram\n2. Raskite botą @userinfobot\n3. Parašykite jam bet ką arba /start\n4. Botas atsiųs jūsų ID numerį\n5. Nukopijuokite šį skaičių į aukščiau esantį laukelį',
+          tgModalClose: 'Supratau',
+        },
+      },
+      en: {
+        paid: 'Payment received!',
+        auto: {
+          subtitle: 'Welcome to Aurora FX Gold Automatic plan',
+          s1Label: 'Lot size',
+          s2Label: 'MT4/MT5',
+          s1Title: 'Choose your position size',
+          s1Desc: 'Lot size determines how much you invest in each trade',
+          l001h: 'For smaller accounts, recommended deposit from $400',
+          l002h: 'Recommended deposit from $1,000',
+          l004h: 'Recommended deposit from $1,000',
+          l006h: 'Recommended deposit from $1,000',
+          l010h: 'For larger accounts, recommended deposit from $2,000',
+          nextBtn: 'Continue →',
+          s2Title: 'Connect your MT4/MT5 account',
+          s2Desc: 'Enter your broker login details. We will automatically execute trades on your behalf.',
+          loginLbl: 'Account number',
+          loginPh:  '12345678',
+          pwLbl:    'Password',
+          pwPh:     '••••••••',
+          pwHint:   'Use your main/trading MT4/MT5 password, not the investor/read-only password. Investor password cannot be used for automatic copying.',
+          srvLbl:   'Server name',
+          srvPh:    'ICMarkets-Live',
+          platLbl:  'Platform',
+          connectBtn: 'Connect account',
+          security: '🔒 Data is encrypted and stored securely. We will never sell your data.',
+          okMsg:  'Account connected successfully! Your account is now active.',
+          errMsg: 'Error connecting account. Please check your details and try again.',
+          loading: 'Connecting…',
+          tgIdLbl: 'Telegram ID',
+          tgIdPh: 'e.g. 123456789',
+          tgIdHint: 'Required to pause/resume copy trading via Telegram bot (/stop and /start commands)',
+          tgUsernameLbl: 'Telegram username',
+          tgUsernamePh: 'e.g. @tadas',
+          optionalLabel: 'optional',
+          tgIdHelp: 'How to find your Telegram ID?',
+          tgModalTitle: 'How to find your Telegram ID?',
+          tgModalBody: '1. Open Telegram\n2. Find the bot @userinfobot\n3. Send it any message or /start\n4. The bot will reply with your ID number\n5. Copy that number into the field above',
+          tgModalClose: 'Got it',
+        },
+      },
+    };
+
+    // ─── State ─────────────────────────────────────────────────────────────────
+    let lang = 'lt';
+    let step = 1;
+    let selectedLot = null;
+    let form = { login: 'DEMO12345', password: 'DemoPassword', server: 'Demo-Server', platform: 'mt4', telegramId: '', telegramUsername: '' };
+
+    const qs = new URLSearchParams(location.search);
+    const sessionId = qs.get('session_id') || '';
+    const resumeToken = qs.get('token') || '';
+    if (!sessionId && !resumeToken) { location.replace('index.html'); }
+    let plan = qs.get('plan') || '';
+    let emailParam = normalizeEmail(qs.get('email') || '');
+    let checkoutReady = false;
+    let checkoutError = false;
+
+    // ─── Escaping (for user-supplied values in HTML attributes) ───────────────
+    function normalizeEmail(v) {
+      return String(v || '').trim().toLowerCase();
+    }
+
+    function esc(v) {
+      return String(v)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    async function loadCheckoutSession() {
+      if (!sessionId && !resumeToken) return;
+
+      try {
+        const endpoint = resumeToken
+          ? '/api/demo/onboarding-resume?token=' + encodeURIComponent(resumeToken)
+          : '/api/demo/checkout-session?session_id=' + encodeURIComponent(sessionId);
+        const res = await fetch(endpoint);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+
+        const data = await res.json();
+        if (data.email) emailParam = normalizeEmail(data.email);
+        if (data.plan) plan = data.plan;
+      } catch (_) {
+        checkoutError = true;
+      } finally {
+        checkoutReady = true;
+        render();
+      }
+    }
+
+    // ─── Persist form values before re-render ─────────────────────────────────
+    function saveForm() {
+      if (step !== 2 || plan !== 'Automatinis') return;
+      form.login      = document.getElementById('f-login')?.value       ?? form.login;
+      form.password   = document.getElementById('f-password')?.value    ?? form.password;
+      form.server     = document.getElementById('f-server')?.value      ?? form.server;
+      form.telegramId = document.getElementById('f-telegram-id')?.value ?? form.telegramId;
+      form.telegramUsername = document.getElementById('f-telegram-username')?.value ?? form.telegramUsername;
+      const checked = document.querySelector('input[name="platform"]:checked');
+      if (checked) form.platform = checked.value;
+    }
+
+    // ─── Language switch ───────────────────────────────────────────────────────
+    function setLang(l) {
+      saveForm();
+      lang = l;
+      document.getElementById('btn-lt').classList.toggle('active', l === 'lt');
+      document.getElementById('btn-en').classList.toggle('active', l === 'en');
+      document.documentElement.lang = l;
+      render();
+    }
+
+    // ─── Lot selection (no full re-render) ────────────────────────────────────
+    function selectLot(size) {
+      selectedLot = size;
+      document.querySelectorAll('.lot-card').forEach(el => {
+        const sel = el.dataset.lot === size;
+        el.classList.toggle('is-selected', sel);
+        el.setAttribute('aria-checked', String(sel));
+      });
+      const btn = document.getElementById('btn-next');
+      if (btn) btn.disabled = false;
+    }
+
+    // ─── Step navigation ──────────────────────────────────────────────────────
+    function goStep2() {
+      if (!selectedLot) return;
+      step = 2;
+      render();
+    }
+
+    // ─── Platform selection (no full re-render) ───────────────────────────────
+    function pickPlatform(val) {
+      form.platform = val;
+      document.querySelectorAll('.platform-pill').forEach(el => {
+        el.classList.toggle('is-selected', el.dataset.plat === val);
+      });
+    }
+
+    // ─── Telegram ID modal ────────────────────────────────────────────────────
+    function openTgModal() {
+      const a = T[lang].auto;
+      document.getElementById('modal-title-text').textContent = a.tgModalTitle;
+      document.getElementById('modal-body-text').textContent  = a.tgModalBody;
+      document.getElementById('modal-close-btn').textContent  = a.tgModalClose;
+      document.getElementById('tg-id-modal').classList.add('is-open');
+    }
+    function closeTgModal() {
+      document.getElementById('tg-id-modal').classList.remove('is-open');
+    }
+
+    // ─── Form submit ──────────────────────────────────────────────────────────
+    async function submitForm(e) {
+      e.preventDefault();
+      const a = T[lang].auto;
+      const login      = document.getElementById('f-login').value.trim();
+      const password   = document.getElementById('f-password').value;
+      const server     = document.getElementById('f-server').value.trim();
+      const platform   = (document.querySelector('input[name="platform"]:checked') || {}).value || 'mt4';
+      const telegramId = (document.getElementById('f-telegram-id')?.value || '').trim();
+      const telegramUsername = (document.getElementById('f-telegram-username')?.value || '').trim();
+      const btn = document.getElementById('btn-connect');
+      const msg = document.getElementById('form-msg');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>' + a.loading;
+      msg.innerHTML = '';
+
+      try {
+        const body = { email: emailParam, lot_size: selectedLot, login, password, server, platform };
+        if (telegramId) body.telegram_user_id = telegramId;
+        if (telegramUsername) body.telegram_username = telegramUsername;
+        const res = await fetch('/api/demo/connect-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const result = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const errText = result.error || a.errMsg;
+          msg.innerHTML = '<div class="msg-err">' + esc(errText) + '</div>';
+          btn.disabled = false;
+          btn.textContent = a.connectBtn;
+          return;
+        }
+        if (result.success) {
+          msg.innerHTML =
+            '<div class="msg-ok">' +
+            '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">' +
+            '<circle cx="10" cy="10" r="10" fill="#DCFCE7"/>' +
+            '<path d="M5 10.5L8.5 14L15 7" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '</svg>' +
+            esc(a.okMsg) + '</div>' +
+            '<a href="#" style="display:block;text-align:center;margin-top:12px;color:#D4A843;text-decoration:none;">Kilus klausimų — susisiekite su mumis per Telegram</a>';
+          btn.style.display = 'none';
+          document.getElementById('connect-form').querySelectorAll('input').forEach(i => i.disabled = true);
+          const step2Dot = document.querySelector('.steps .step:last-child .step-dot');
+          if (step2Dot) {
+            step2Dot.classList.add('is-done');
+            step2Dot.innerHTML = STEP_DONE_SVG;
+          }
+        } else {
+          msg.innerHTML = '<div class="msg-err">' + esc(a.errMsg) + '</div>';
+          btn.disabled = false;
+          btn.textContent = a.connectBtn;
+        }
+      } catch (_) {
+        msg.innerHTML = '<div class="msg-err">' + esc(a.errMsg) + '</div>';
+        btn.disabled = false;
+        btn.textContent = a.connectBtn;
+      }
+    }
+
+    // ─── SVG icons ────────────────────────────────────────────────────────────
+    const CHECK_SVG =
+      '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">' +
+      '<path d="M7 16.5L12.5 22L25 10" stroke="#22C55E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>';
+
+    const STEP_DONE_SVG =
+      '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">' +
+      '<path d="M2 7.5L5.5 11L12 4" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>';
+
+    const TG_SVG =
+      '<svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+      '<path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z"/>' +
+      '<path d="M17.507 7.685l-1.93 9.107c-.145.644-.524.8-1.062.497l-2.936-2.162-1.417 1.363a.737.737 0 0 1-.59.288l.21-2.985 5.431-4.909c.237-.21-.052-.327-.366-.117L7.23 13.574l-2.9-.906c-.631-.197-.643-.631.132-.934l11.336-4.369c.524-.19.985.127.71.32z" fill="white"/>' +
+      '</svg>';
+
+    // ─── Lot card HTML ────────────────────────────────────────────────────────
+    function lotCard(size, hint) {
+      const sel = selectedLot === size;
+      return (
+        '<button type="button" class="lot-card' + (sel ? ' is-selected' : '') + '" data-lot="' + size + '"' +
+        ' onclick="selectLot(\'' + size + '\')"' +
+        ' onkeydown="if(event.key===\' \'){event.preventDefault();selectLot(\'' + size + '\')}"' +
+        ' role="radio" aria-checked="' + sel + '">' +
+        '<div class="lot-radio"><div class="lot-radio-dot"></div></div>' +
+        '<div class="lot-text">' +
+        '<div class="lot-row"><span class="lot-size">' + size + ' lot</span></div>' +
+        '<div class="lot-hint">' + esc(hint) + '</div>' +
+        '</div></button>'
+      );
+    }
+
+    // ─── Platform pill HTML ───────────────────────────────────────────────────
+    function platPill(val, label) {
+      const sel = form.platform === val;
+      return (
+        '<label class="platform-pill' + (sel ? ' is-selected' : '') + '" data-plat="' + val + '"' +
+        ' onclick="pickPlatform(\'' + val + '\')">' +
+        '<input type="radio" name="platform" value="' + val + '"' + (sel ? ' checked' : '') +
+        ' onchange="pickPlatform(\'' + val + '\')">' +
+        '<div class="plat-dot"><div class="plat-dot-inner"></div></div>' +
+        '<span class="plat-label">' + label + '</span>' +
+        '</label>'
+      );
+    }
+
+    // ─── Render: Automatinis ──────────────────────────────────────────────────
+    function renderAutomatinis() {
+      const t = T[lang], a = t.auto;
+      const s1 = step === 1, s2 = step === 2;
+
+      return (
+        // Header
+        '<div class="page-header">' +
+        '<div class="check-ring">' + CHECK_SVG + '</div>' +
+        '<h1 class="page-title">' + esc(t.paid) + '</h1>' +
+        '<p class="page-subtitle">' + esc(a.subtitle) + '</p>' +
+        '</div>' +
+
+        // Steps indicator
+        '<div class="steps">' +
+        '<div class="step">' +
+        '<div class="step-dot ' + (s2 ? 'is-done' : 'is-active') + '">' + (s2 ? STEP_DONE_SVG : '1') + '</div>' +
+        '<div class="step-name' + (s1 ? ' is-active' : '') + '">' + esc(a.s1Label) + '</div>' +
+        '</div>' +
+        '<div class="step-line' + (s2 ? ' is-done' : '') + '"></div>' +
+        '<div class="step">' +
+        '<div class="step-dot' + (s2 ? ' is-active' : '') + '">2</div>' +
+        '<div class="step-name' + (s2 ? ' is-active' : '') + '">' + esc(a.s2Label) + '</div>' +
+        '</div>' +
+        '</div>' +
+
+        // Step 1
+        '<div id="step1"' + (s1 ? '' : ' hidden') + '>' +
+        '<h2 class="section-title">' + esc(a.s1Title) + '</h2>' +
+        '<p class="section-desc">' + esc(a.s1Desc) + '</p>' +
+        '<div class="lot-grid" role="radiogroup" aria-label="' + esc(a.s1Title) + '">' +
+        lotCard('0.01', a.l001h) +
+        lotCard('0.02', a.l002h) +
+        lotCard('0.04', a.l004h) +
+        lotCard('0.06', a.l006h) +
+        lotCard('0.10', a.l010h) +
+        '</div>' +
+        '<button class="btn btn-gold btn-w100" id="btn-next" onclick="goStep2()"' +
+        (selectedLot ? '' : ' disabled') + '>' + esc(a.nextBtn) + '</button>' +
+        '</div>' +
+
+        // Step 2
+        '<div id="step2"' + (s2 ? '' : ' hidden') + '>' +
+        '<h2 class="section-title">' + esc(a.s2Title) + '</h2>' +
+        '<p class="section-desc">' + esc(a.s2Desc) + '</p>' +
+
+        '<form id="connect-form" onsubmit="submitForm(event)" novalidate>' +
+
+        '<div class="form-field">' +
+        '<label class="form-label" for="f-login">' + esc(a.loginLbl) + '</label>' +
+        '<input class="form-input" type="number" id="f-login" inputmode="numeric"' +
+        ' placeholder="' + esc(a.loginPh) + '" value="' + esc(form.login) + '" required min="1">' +
+        '</div>' +
+
+        '<div class="form-field">' +
+        '<label class="form-label" for="f-password">' + esc(a.pwLbl) + '</label>' +
+        '<input class="form-input" type="password" id="f-password"' +
+        ' placeholder="' + esc(a.pwPh) + '" value="' + esc(form.password) + '" required autocomplete="current-password">' +
+        '<p class="input-hint">' + esc(a.pwHint) + '</p>' +
+        '<p class="input-hint">' + a.security + '</p>' +
+        '</div>' +
+
+        '<div class="form-field">' +
+        '<label class="form-label" for="f-server">' + esc(a.srvLbl) + '</label>' +
+        '<input class="form-input" type="text" id="f-server"' +
+        ' placeholder="' + esc(a.srvPh) + '" value="' + esc(form.server) + '" required>' +
+        '</div>' +
+
+        '<div class="form-field">' +
+        '<label class="form-label">' + esc(a.platLbl) + '</label>' +
+        '<div class="platform-row">' + platPill('mt4', 'MT4') + platPill('mt5', 'MT5') + '</div>' +
+        '</div>' +
+
+        '<div class="form-field">' +
+        '<label class="form-label" for="f-telegram-id">' + esc(a.tgIdLbl) + ' <span style="color:var(--gray-400);font-weight:400">(nebūtina)</span></label>' +
+        '<input class="form-input" type="text" id="f-telegram-id" inputmode="numeric"' +
+        ' placeholder="' + esc(a.tgIdPh) + '" value="' + esc(form.telegramId) + '">' +
+        '<p class="input-hint">' + esc(a.tgIdHint) + ' — <a href="#" onclick="event.preventDefault();openTgModal()" style="color:var(--gold-dark);text-decoration:none;font-weight:500;">' + esc(a.tgIdHelp) + '</a></p>' +
+        '</div>' +
+
+        '<div class="form-field">' +
+        '<label class="form-label" for="f-telegram-username">' + esc(a.tgUsernameLbl) + ' <span style="color:var(--gray-400);font-weight:400">(' + esc(a.optionalLabel) + ')</span></label>' +
+        '<input class="form-input" type="text" id="f-telegram-username"' +
+        ' placeholder="' + esc(a.tgUsernamePh) + '" value="' + esc(form.telegramUsername) + '">' +
+        '</div>' +
+
+
+        '<div style="margin-top:8px">' +
+        '<button type="submit" class="btn btn-gold btn-w100" id="btn-connect">' + esc(a.connectBtn) + '</button>' +
+        '</div>' +
+
+        '<div id="form-msg"></div>' +
+        '</form>' +
+        '</div>'
+      );
+    }
+
+    // ─── Render: Unknown plan ─────────────────────────────────────────────────
+    function renderLoading() {
+      return (
+        '<div class="page-header">' +
+        '<div class="check-ring"><span class="spinner"></span></div>' +
+        '<h1 class="page-title">' + (lang === 'lt' ? 'Tikrinamas mokėjimas' : 'Checking payment') + '</h1>' +
+        '<p class="page-subtitle">' + (lang === 'lt' ? 'Palaukite kelias sekundes.' : 'Please wait a few seconds.') + '</p>' +
+        '</div>'
+      );
+    }
+
+    function renderCheckoutError() {
+      return (
+        '<div class="err-state">' +
+        '<div style="font-size:52px;margin-bottom:20px">!</div>' +
+        '<h2>' + (lang === 'lt' ? 'Nepavyko patikrinti mokėjimo' : 'Could not verify payment') + '</h2>' +
+        '<p>' + (lang === 'lt' ? 'Parašykite mums į Telegram.' : 'Message us on Telegram.') + '</p>' +
+        '</div>'
+      );
+    }
+
+    function renderError() {
+      return (
+        '<div class="err-state">' +
+        '<div style="font-size:52px;margin-bottom:20px">⚠️</div>' +
+        '<h2>Unknown plan</h2>' +
+        '<p>Please check your link or message us on Telegram.</p>' +
+        '</div>'
+      );
+    }
+
+    // ─── Main render ──────────────────────────────────────────────────────────
+    function render() {
+      const app = document.getElementById('app');
+      if (!checkoutReady) {
+        app.innerHTML = renderLoading();
+      } else if (checkoutError) {
+        app.innerHTML = renderCheckoutError();
+      } else if (plan === 'Automatinis' || plan === 'AutomatinisMetinis') {
+        app.innerHTML = renderAutomatinis();
+      } else {
+        app.innerHTML = renderError();
+      }
+    }
+
+    render();
+    loadCheckoutSession();
+  </script>
+</body>
+</html>

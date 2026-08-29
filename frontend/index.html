@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<!-- PORTFOLIO/DEMO VERSION — No real credentials or live trading -->
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AURORA XAU — Aukso Auto Trading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #080806;
+  --bg2:      #0e0d0a;
+  --bg3:      #141210;
+  --gold:     #c9a84c;
+  --gold2:    #e8c96a;
+  --gold3:    #f5e0a0;
+  --gold-dim: #6b5a2a;
+  --text:     #e8e2d0;
+  --muted:    #7a7060;
+  --line:     rgba(201,168,76,0.12);
+  --line2:    rgba(201,168,76,0.22);
+  --head:     'Lora', serif;
+  --body:     'Outfit', sans-serif;
+}
+
+html { scroll-behavior: smooth; overflow-x: hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 16px;
+  overflow-x: hidden;
+  cursor: default;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Prevent any child from breaking layout width */
+section, nav, footer, div { max-width: 100%; }
+
+/* Grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 24px 60px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(to bottom, rgba(8,8,6,0.95), transparent);
+}
+
+.logo {
+  font-family: var(--head);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 6px;
+  color: var(--gold2);
+  text-transform: uppercase;
+}
+
+.nav-links { display: flex; gap: 36px; align-items: center; }
+.nav-links a {
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); text-decoration: none; font-weight: 400;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--gold3); }
+
+.btn-nav {
+  border: 1px solid var(--gold-dim);
+  color: var(--gold2);
+  padding: 10px 24px;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  text-decoration: none; font-family: var(--body);
+  transition: all 0.3s;
+}
+.btn-nav:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+.lang-switch {
+  display: flex; align-items: center; gap: 0;
+  border: 1px solid var(--line2); border-radius: 4px; overflow: hidden;
+}
+.lang-btn {
+  background: none; border: none; border-right: 1px solid var(--line2); cursor: pointer;
+  font-family: var(--body); font-size: 11px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); padding: 8px 14px; transition: all 0.2s;
+}
+.lang-btn:last-child { border-right: none; }
+.lang-btn.active { background: rgba(201,168,76,0.15); color: var(--gold2); }
+.lang-btn:hover:not(.active) { color: var(--text); background: rgba(255,255,255,0.03); }
+
+/* Market status */
+.market-closed .price-dot {
+  background: #ff4d4d !important;
+  animation: pulseRed 1.5s infinite !important;
+}
+@keyframes pulseRed {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,77,77,0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(255,77,77,0); }
+}
+.market-status-label {
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 3px;
+}
+.market-open  { color: #4dff91; background: rgba(77,255,145,0.1); }
+.market-closed-label { color: #ff4d4d; background: rgba(255,77,77,0.1); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  padding: 120px 40px 80px;
+  position: relative; overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,168,76,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(201,168,76,0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Animated gold lines */
+.hero-lines {
+  position: absolute; inset: 0; pointer-events: none;
+  overflow: hidden;
+}
+.hero-lines::before, .hero-lines::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.3), transparent);
+  animation: lineFade 4s ease-in-out infinite;
+}
+.hero-lines::before { height: 300px; left: 30%; top: -300px; animation-delay: 0s; }
+.hero-lines::after  { height: 200px; left: 70%; top: -200px; animation-delay: 2s; }
+
+@keyframes lineFade {
+  0%   { transform: translateY(0); opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(110vh); opacity: 0; }
+}
+
+.hero-eyebrow {
+  font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 32px;
+  display: flex; align-items: center; gap: 16px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; display: block; width: 40px; height: 1px; background: var(--gold-dim);
+}
+
+h1 {
+  font-family: var(--head);
+  font-size: clamp(56px, 9vw, 120px);
+  font-weight: 300;
+  line-height: 0.9;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+h1 em {
+  font-style: italic;
+  color: var(--gold2);
+  display: block;
+  animation: heroWordReveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.3s;
+}
+@keyframes heroWordReveal {
+  0%   { opacity: 0; transform: translateY(18px) skewX(-4deg); filter: blur(8px); }
+  60%  { filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) skewX(0deg); filter: blur(0); }
+}
+
+.hero-sub-title {
+  font-family: var(--head);
+  font-size: clamp(18px, 2.5vw, 28px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+}
+
+.hero-desc {
+  font-size: 15px; font-weight: 300;
+  color: var(--text); max-width: 440px;
+  line-height: 1.8; margin: 0 auto 56px;
+  letter-spacing: 0.3px;
+}
+
+.hero-ctas { display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 240px; margin: 0 auto; }
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+  color: var(--bg);
+  padding: 16px 40px;
+  font-family: var(--body);
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.3s;
+  position: relative; overflow: hidden;
+  width: 100%; text-align: center;
+}
+.btn-gold::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.1);
+  transform: translateX(-100%);
+  transition: transform 0.4s;
+}
+.btn-gold:hover::after { transform: translateX(0); }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,168,76,0.3); }
+
+.btn-ghost {
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  padding: 16px 40px;
+  font-size: 12px; font-weight: 400;
+  letter-spacing: 2px; text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.3s;
+  width: 100%; text-align: center;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold2); }
+
+/* Live price tag */
+.live-price {
+  display: inline-flex; align-items: center; gap: 12px;
+  border: 1px solid var(--line2);
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+.price-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #4dff91;
+  animation: pulseDot 2s infinite;
+}
+@keyframes pulseDot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(77,255,145,0.4); }
+  50% { box-shadow: 0 0 0 5px rgba(77,255,145,0); }
+}
+.price-val { font-family: var(--head); font-size: 18px; color: var(--gold2); }
+.price-change { color: #4dff91; font-size: 12px; }
+
+/* ── DIVIDER ── */
+.divider {
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 60px; margin: 0 auto;
+  max-width: 1100px;
+  opacity: 0.4;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--gold);
+}
+.divider-icon { color: var(--gold); font-size: 14px; letter-spacing: 4px; }
+
+/* ── STATS ── */
+.stats-section { padding: 80px 60px; max-width: 1100px; margin: 0 auto; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--line);
+}
+
+.stat {
+  padding: 48px 32px;
+  border-right: 1px solid var(--line);
+  text-align: center;
+  position: relative;
+  transition: background 0.3s;
+}
+.stat:last-child { border-right: none; }
+.stat:hover { background: rgba(201,168,76,0.03); }
+
+.stat-num {
+  font-family: var(--head);
+  font-size: 54px; font-weight: 300;
+  color: var(--gold2); line-height: 1;
+  margin-bottom: 12px;
+}
+.stat-num sup { font-size: 24px; vertical-align: super; }
+
+.stat-label {
+  font-size: 11px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+}
+
+.drawdown-help {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--gold-dim);
+  border-radius: 50%;
+  background: rgba(201,168,76,0.04);
+  color: var(--gold-dim);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+  z-index: 25;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.drawdown-help:hover,
+.drawdown-help:focus,
+.drawdown-help.open {
+  border-color: var(--gold);
+  color: var(--gold2);
+  background: rgba(201,168,76,0.1);
+}
+.drawdown-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translate(-50%, 6px);
+  width: max-content;
+  max-width: 220px;
+  min-width: 190px;
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.45;
+  padding: 8px 12px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  z-index: 20;
+}
+.drawdown-help:hover + .drawdown-tooltip,
+.drawdown-help:focus + .drawdown-tooltip,
+.drawdown-help.open + .drawdown-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+/* ── HOW IT WORKS ── */
+.section { padding: 100px 60px; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+
+.section-eyebrow {
+  font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 20px;
+}
+
+h2 {
+  font-family: var(--head);
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 300; line-height: 1.05;
+  letter-spacing: -0.5px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+h2 em { font-style: italic; color: var(--gold2); text-transform: uppercase; }
+
+.section-sub {
+  font-size: 15px; font-weight: 300;
+  color: var(--text); max-width: 460px;
+  line-height: 1.8; margin-bottom: 64px;
+}
+
+.steps {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 1px; background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.step {
+  background: var(--bg2);
+  padding: 48px 40px;
+  position: relative;
+  transition: background 0.3s;
+}
+.step:hover { background: var(--bg3); }
+
+.step-num {
+  font-family: var(--head);
+  font-size: 72px; font-weight: 300;
+  color: rgba(201,168,76,0.1);
+  line-height: 1;
+  margin-bottom: 24px;
+  transition: color 0.3s;
+}
+.step:hover .step-num { color: rgba(201,168,76,0.2); }
+
+.step-title {
+  font-family: var(--head);
+  font-size: 22px; font-weight: 400;
+  color: var(--text); margin-bottom: 12px;
+}
+
+.step-desc {
+  font-size: 14px; font-weight: 300;
+  color: var(--muted); line-height: 1.7;
+}
+
+.step-tag {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--gold);
+  border-bottom: 1px solid var(--gold-dim);
+  padding-bottom: 2px;
+}
+
+/* ── TRACK RECORD ── */
+.track-section { padding: 100px 60px; background: var(--bg2); }
+
+.trades-table {
+  width: 100%; border-collapse: collapse;
+  margin-top: 48px;
+}
+
+.trades-table th {
+  text-align: left;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); font-weight: 400;
+  padding: 8px 20px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.trades-table td {
+  padding: 18px 20px;
+  font-size: 14px; font-weight: 300;
+  border-bottom: 1px solid rgba(201,168,76,0.06);
+  transition: background 0.2s;
+}
+
+.trades-table tr:hover td { background: rgba(201,168,76,0.02); }
+
+.t-pair { font-family: var(--head); font-size: 17px; color: var(--gold3); }
+.t-buy  { color: #4dff91; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+.t-sell { color: #ff7070; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+
+.t-profit { font-family: var(--head); font-size: 20px; }
+.t-profit.pos { color: #4dff91; }
+.t-profit.neg { color: #ff7070; }
+
+.t-date { color: var(--muted); font-size: 13px; }
+
+.monthly-profit-card {
+  width: 100%;
+  min-height: 136px;
+  margin-top: 24px;
+  padding: 30px 32px;
+  border: 1px solid rgba(201,168,76,0.22);
+  background:
+    radial-gradient(ellipse 80% 120% at 50% 0%, rgba(201,168,76,0.07), transparent 62%),
+    var(--bg);
+  box-shadow: 0 0 30px rgba(201,168,76,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.monthly-profit-month {
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 6px;
+}
+
+.monthly-profit-label {
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
+.monthly-profit-value {
+  font-family: var(--head);
+  font-size: 28px;
+  line-height: 1;
+  color: #4dff91;
+  font-weight: 600;
+  text-shadow: 0 0 24px rgba(77,255,145,0.18);
+  width: 100%;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Equity curve */
+.equity-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 48px; margin-top: 64px; align-items: start;
+}
+
+.equity-chart { position: relative; }
+
+.equity-label {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px;
+}
+
+.equity-big {
+  font-family: var(--head); font-size: 64px; font-weight: 300;
+  color: var(--gold2); line-height: 1;
+}
+.equity-big span { font-size: 28px; color: var(--gold); }
+
+.equity-period {
+  font-size: 13px; color: var(--muted); margin-top: 8px;
+  font-weight: 300;
+}
+
+/* ── PRICING ── */
+.pricing-section { padding: 100px 60px; }
+
+.plans {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2px; max-width: 960px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.plan {
+  background: var(--bg);
+  padding: 52px 48px;
+  position: relative;
+  transition: background 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+.plan-features { flex: 1; }
+.plan:hover { background: var(--bg2); }
+.plan.featured { background: var(--bg2); }
+
+.plan-tag {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 32px; display: block;
+}
+
+.plan-price {
+  font-family: var(--head);
+  font-size: 72px; font-weight: 300;
+  color: var(--text); line-height: 1;
+  letter-spacing: -2px;
+}
+.plan-price sup { font-size: 28px; color: var(--gold); vertical-align: super; }
+.plan-price sub { font-size: 16px; color: var(--muted); font-family: var(--body); font-weight: 300; letter-spacing: 0; }
+
+.plan-desc {
+  font-size: 13px; font-weight: 300; color: var(--muted);
+  line-height: 1.7; margin: 20px 0 36px;
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+}
+
+.plan-features { list-style: none; margin-bottom: 0; }
+.plan-features li {
+  font-size: 14px; font-weight: 300; color: var(--muted);
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(201,168,76,0.06);
+  display: flex; align-items: center; gap: 12px;
+}
+.plan-features li::before {
+  content: '—'; color: var(--gold); font-size: 12px; flex-shrink: 0;
+}
+
+.btn-plan {
+  display: block; width: 100%; text-align: center;
+  padding: 16px; font-family: var(--body);
+  font-size: 11px; font-weight: 500; letter-spacing: 2px;
+  text-transform: uppercase; text-decoration: none;
+  cursor: pointer; border: none; transition: all 0.3s;
+  margin-top: auto;
+  padding-top: 16px;
+}
+.btn-plan-outline {
+  background: transparent; border: 1px solid var(--gold-dim); color: var(--gold);
+}
+.btn-plan-outline:hover { border-color: var(--gold); color: var(--gold2); }
+.btn-plan-solid {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+  color: var(--bg);
+}
+.btn-plan-solid:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(201,168,76,0.25); }
+
+.plan-save {
+  display: inline-block;
+  font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: #4dff91; margin-top: 10px; margin-bottom: 0;
+  font-weight: 500;
+}
+
+.featured-badge {
+  position: absolute; top: 0; right: 48px;
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  font-weight: 600; padding: 6px 14px;
+}
+
+
+/* ── TRUST ── */
+.trust-section { padding: 80px 60px; background: var(--bg); }
+.trust-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 48px; max-width: 1000px; margin: 0 auto;
+}
+.trust-item { text-align: center; }
+.trust-icon { font-size: 28px; margin-bottom: 16px; }
+.trust-title {
+  font-family: var(--head); font-size: 18px; font-weight: 400;
+  color: var(--gold2); margin-bottom: 8px;
+}
+.trust-desc { font-size: 13px; font-weight: 300; color: var(--text); line-height: 1.7; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 60px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 24px;
+}
+.footer-logo {
+  font-family: var(--head); font-size: 22px;
+  letter-spacing: 6px; color: var(--gold2); text-transform: uppercase;
+}
+.footer-links { display: flex; gap: 32px; }
+.footer-links a {
+  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); text-decoration: none; transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--gold); }
+.footer-disc {
+  width: 100%;
+  font-size: 11px; color: rgba(122,112,96,0.5);
+  line-height: 1.7; max-width: 700px;
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(12px);
+  z-index: 1000; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  padding: 56px 48px;
+  max-width: 480px; width: 100%;
+  position: relative;
+}
+.modal-close {
+  position: absolute; top: 14px; right: 18px;
+  background: none; border: none;
+  color: var(--gold); font-size: 28px; cursor: pointer;
+  opacity: 0.8;
+  transition: color 0.2s, opacity 0.2s;
+}
+.modal-close:hover { opacity: 1; color: var(--gold2); }
+
+.modal-eyebrow {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px;
+}
+.modal h3 {
+  font-family: var(--head); font-size: 36px; font-weight: 300;
+  margin-bottom: 8px; color: var(--text);
+}
+.modal-plan { font-size: 13px; color: var(--muted); margin-bottom: 36px; }
+
+.modal label {
+  display: block; font-size: 11px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+}
+.modal input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 14px 16px;
+  color: var(--text); font-size: 15px;
+  font-family: var(--body); margin-bottom: 20px;
+  outline: none; transition: border-color 0.2s;
+}
+.modal input:focus { border-color: var(--gold-dim); }
+
+.modal-investor-note {
+  background: rgba(201,168,76,0.06);
+  border: 1px solid var(--line2);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-size: 13px; font-weight: 300; color: var(--muted);
+  line-height: 1.7;
+}
+.modal-investor-note strong { color: var(--gold2); font-weight: 400; }
+
+.modal-price-row {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding: 16px 0; margin-bottom: 28px;
+}
+.modal-price-label { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.modal-price-val {
+  font-family: var(--head); font-size: 28px; font-weight: 300; color: var(--gold2);
+}
+
+.btn-pay {
+  width: 100%; padding: 16px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+  color: var(--bg); border: none;
+  font-family: var(--body); font-size: 12px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.3s;
+}
+.btn-pay:hover { box-shadow: 0 8px 30px rgba(201,168,76,0.3); transform: translateY(-1px); }
+.modal-secure { text-align: center; font-size: 11px; color: var(--muted); margin-top: 12px; letter-spacing: 0.5px; }
+
+/* ── MOBILE NAV ── */
+.nav-mobile-right {
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-tg-icon {
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+.nav-tg-icon:hover { opacity: 1; }
+.nav-dc-icon {
+  color: #8891f2;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+.nav-dc-icon:hover { opacity: 1; }
+
+.hamburger {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 2px 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+#mobile-menu {
+  display: none;
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--line);
+}
+#mobile-menu.open { max-height: 400px; }
+
+.mobile-menu-link {
+  display: block;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  transition: color 0.2s;
+}
+.mobile-menu-link:hover { color: var(--text); }
+
+.mobile-menu-cta {
+  display: block;
+  margin: 16px 24px;
+  padding: 14px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+  color: var(--bg);
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.mobile-menu-cta:hover { box-shadow: 0 4px 20px rgba(201,168,76,0.3); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    width: 100%;
+    background: rgba(8,8,6,0.97);
+  }
+  nav .nav-links { display: none; }
+  .nav-mobile-right { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
+  #mobile-menu { display: block; position: absolute; top: 100%; left: 0; right: 0; }
+  /* Logo shrink */
+  nav .logo { font-size: 18px; letter-spacing: 5px; }
+  nav a[href="#"] { gap: 8px !important; flex-shrink: 0; }
+  /* Lang buttons shrink */
+  nav .lang-btn { padding: 8px 14px; font-size: 12px; letter-spacing: 1.5px; }
+  /* Telegram icon shrink */
+  .nav-tg-icon svg { width: 22px; height: 22px; }
+  /* Hamburger shrink */
+  .hamburger { font-size: 26px; padding: 4px 8px; }
+
+  .hero { padding: 80px 24px 56px; overflow: hidden; min-height: auto; }
+  .hero-lines { display: none; }
+  .hero-lines::before, .hero-lines::after { display: none; }
+  .hero-glow { display: none; }
+  .hero-bg { display: none; }
+  .hero-eyebrow { font-size: 10px; gap: 10px; }
+  .hero-eyebrow::before, .hero-eyebrow::after { width: 24px; }
+  .live-price { padding: 8px 16px; gap: 8px; }
+  .price-val { font-size: 15px; }
+  h1 { font-size: clamp(26px, 7.5vw, 40px); letter-spacing: -1px; word-break: normal; overflow-wrap: normal; hyphens: none; }
+  .hero-sub-title { font-size: 16px; }
+  .hero-desc { font-size: 14px; margin-bottom: 40px; }
+  .btn-gold, .btn-ghost { padding: 14px 28px; font-size: 11px; }
+
+  .divider { padding: 0 20px; }
+
+  .stats-section { padding: 48px 20px; }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    border-radius: 0;
+  }
+  .stat { padding: 28px 16px; }
+  .stat-num { font-size: 38px; }
+  .stat-label { font-size: 10px; }
+
+  .section { padding: 56px 20px; }
+  .section-inner { max-width: 100%; }
+  h2 { font-size: 36px; }
+  .section-sub { font-size: 14px; margin-bottom: 40px; }
+
+  /* Founder section mobile */
+  section[style*="padding: 80px 60px"] > div,
+  .founder-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+
+  .steps { grid-template-columns: 1fr; gap: 0; }
+  .step { padding: 32px 24px; }
+  .step-num { font-size: 52px; margin-bottom: 16px; }
+  .step-title { font-size: 20px; }
+
+  .track-section { padding: 56px 20px; }
+  .trades-table { width: 100%; }
+  .trades-table th { font-size: 9px; padding: 0 6px 10px; letter-spacing: 0.5px; }
+  .trades-table td { font-size: 11px; padding: 10px 6px; }
+  .trades-table .t-profit { font-size: 13px; }
+  .trades-table th:nth-child(2),
+  .trades-table td:nth-child(2) { display: none; }
+  .monthly-profit-card { min-height: 124px; padding: 26px 20px; }
+  .monthly-profit-month { font-size: 13px; letter-spacing: 2px; }
+  .monthly-profit-label { font-size: 12px; margin-bottom: 16px; }
+  .monthly-profit-value { font-size: 24px; }
+
+  .equity-row { grid-template-columns: 1fr; gap: 32px; margin-top: 40px; }
+  .equity-big { font-size: 48px; }
+
+  .pricing-section { padding: 56px 20px; }
+  .plans {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+  .plan-save { font-size: 11px; }
+  .plan { padding: 40px 28px; }
+  .plan-price { font-size: 56px; }
+  .featured-badge { right: 28px; }
+
+  .trust-section { padding: 56px 20px; }
+  .trust-grid { grid-template-columns: 1fr; gap: 32px; }
+
+  /* Demo strip mobile */
+  [style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+
+  /* Global mobile padding safety — catches inline-padded sections */
+  section, .stats-section, .track-section, .pricing-section, .trust-section,
+  div[style*="padding:40px 60px"], div[style*="padding: 80px 60px"],
+  div[style*="padding:100px 60px"], div[style*="padding: 100px 60px"] {
+    padding-left: max(20px, env(safe-area-inset-left, 0px) + 20px);
+    padding-right: max(20px, env(safe-area-inset-right, 0px) + 20px);
+  }
+
+  footer { padding: 40px 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
+  .footer-links { flex-wrap: wrap; gap: 16px; }
+
+  .modal { padding: 32px 20px; margin: 16px; }
+  .modal h3 { font-size: 28px; }
+}
+
+@media (max-width: 480px) {
+  .trades-table th { font-size: 8px; padding: 0 4px 9px; letter-spacing: 0.3px; }
+  .trades-table td { font-size: 10px; padding: 9px 4px; }
+  .trades-table .t-profit { font-size: 12px; }
+  .drawdown-help { top: 10px; right: 10px; width: 20px; height: 20px; font-size: 12px; }
+  .drawdown-tooltip {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    bottom: auto;
+    width: calc(100vw - 64px);
+    min-width: 0;
+    max-width: 220px;
+    transform: translate(-50%, calc(-50% + 6px));
+  }
+  .drawdown-help:hover + .drawdown-tooltip,
+  .drawdown-help:focus + .drawdown-tooltip,
+  .drawdown-help.open + .drawdown-tooltip {
+    transform: translate(-50%, -50%);
+  }
+}
+</style>
+</head>
+<body>
+<div id="demo-banner" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:#1a1200;border-bottom:1px solid #c9a84c44;padding:8px 20px;text-align:center;font-family:sans-serif;font-size:13px;color:#c9a84c;letter-spacing:0.5px;">
+  ⚠️ Portfolio Demo — synthetic data only · no live trading · no real payments
+  <button onclick="this.parentElement.style.display='none'" style="margin-left:16px;background:none;border:none;color:#c9a84c;cursor:pointer;font-size:16px;line-height:1;">×</button>
+</div>
+
+<nav>
+<a href="#" class="logo" style="text-decoration:none;line-height:1;">Aurora <span style="font-size:14px;letter-spacing:3px;color:var(--gold-dim);font-family:var(--body);">XAU</span></a>
+  <div class="nav-links">
+    <a href="#kaip-veikia" data-i18n="nav_how">Kaip veikia</a>
+    <a href="#rezultatai" data-i18n="nav_results">Rezultatai</a>
+    <a href="#planai" data-i18n="nav_plans">Planai</a>
+    <div class="lang-switch">
+      <button class="lang-btn active" onclick="setLang('lt')" data-lang="lt" title="Lietuvių">LT</button>
+      <button class="lang-btn" onclick="setLang('en')" data-lang="en" title="English">EN</button>
+    </div>
+    <a href="#planai" class="btn-nav" data-i18n="nav_cta">Pradėti</a>
+  </div>
+
+  <!-- Mobile: lang switcher + Telegram icon + hamburger -->
+  <div class="nav-mobile-right">
+    <div class="lang-switch">
+      <button class="lang-btn active" onclick="setLang('lt')" data-lang="lt" title="Lietuvių">LT</button>
+      <button class="lang-btn" onclick="setLang('en')" data-lang="en" title="English">EN</button>
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Meniu">☰</button>
+  </div>
+
+  <!-- Mobile dropdown panel -->
+  <div id="mobile-menu">
+    <a href="#kaip-veikia" class="mobile-menu-link" onclick="closeMobileMenu()" data-i18n="nav_how">Kaip veikia</a>
+    <a href="#rezultatai" class="mobile-menu-link" onclick="closeMobileMenu()" data-i18n="nav_results">Rezultatai</a>
+    <a href="#planai" class="mobile-menu-link" onclick="closeMobileMenu()" data-i18n="nav_plans">Planai</a>
+    <a href="#planai" class="mobile-menu-cta" onclick="closeMobileMenu()" data-i18n="nav_cta">Pradėti</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+
+  <div class="live-price" id="live-price-block">
+    <span class="market-status-label market-open" id="market-status-label">Rinka atidaryta</span>
+    <span class="price-dot" id="price-dot"></span>
+  </div>
+
+  <div id="hero-pnl-block" style="margin-bottom:38px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;border:1px solid var(--gold-dim);padding:12px 20px;background:var(--bg2);box-shadow:0 0 20px rgba(201,168,76,0.07);">
+      <span id="hero-pnl-today-label" style="font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold);">Šiandienos pelnas</span>
+      <span id="hero-pnl-today-value" style="font-size:22px;letter-spacing:0.5px;font-family:var(--head);color:#7a7060;">$0.00</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;border:1px solid var(--gold-dim);padding:12px 20px;background:var(--bg2);box-shadow:0 0 20px rgba(201,168,76,0.07);">
+      <span id="hero-pnl-month-label" style="font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold);">Gegužės pelnas</span>
+      <span id="hero-pnl-month-value" style="font-size:22px;letter-spacing:0.5px;font-family:var(--head);color:#7a7060;">$0.00</span>
+    </div>
+  </div>
+
+  <h1><span data-i18n="hero_h1">Prekiauju tik XAUUSD,</span><em data-i18n="hero_h1em">automatizuota sistema su aiškia rizika</em></h1>
+  <p class="hero-desc" data-i18n="hero_desc">
+    Ne pažadai apie greitą pelną. Aiški rizika, disciplinuoti taisykliai, automatinis vykdymas.
+  </p>
+  <div class="hero-ctas">
+    <a href="#planai" class="btn-gold" data-i18n="hero_cta1">Pradėti dabar</a>
+    <a href="#rezultatai" class="btn-ghost" data-i18n="hero_cta2">Žiūrėti rezultatus</a>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+      <a href="#" target="_blank" class="nav-tg-icon" aria-label="Telegram" style="display:flex;align-items:center;gap:6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
+        Telegram
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><span class="divider-icon">◆ ◆ ◆</span></div>
+
+<!-- TRUST -->
+<section class="trust-section">
+  <div class="section-inner">
+    <div class="trust-grid">
+      <div class="trust-item">
+        <div class="trust-icon">🔒</div>
+        <div class="trust-title">MetaAPI</div>
+        <div class="trust-desc" data-i18n="trust1_desc">MT4/MT5 sąskaita prijungiama per saugų MetaAPI ryšį. Automatiniam kopijavimui reikalingas pagrindinis/prekybinis slaptažodis, ne tik stebėjimui skirtas read-only slaptažodis.</div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">📊</div>
+        <div class="trust-title" data-i18n="trust2_title">Skaidri sandorių istorija</div>
+        <div class="trust-desc" data-i18n="trust2_desc">Sandorių istorija rodoma tokia, kokia yra — be filtravimo. Rodome ir nuostolius. Demo versijoje naudojami sintetiniai duomenys.</div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">⚡</div>
+        <div class="trust-title" data-i18n="trust3_title">Viena pora — ekspertizė</div>
+        <div class="trust-desc" data-i18n="trust3_desc">Prekiaujame tik XAUUSD — auksu. Gilus supratimas vienos rinkos yra stipresnis nei paviršutinis visų.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="kaip-veikia">
+  <div class="section-inner">
+    <div class="section-eyebrow" data-i18n="how_eyebrow">Procesas</div>
+    <h2><span data-i18n="how_h2">Du žingsniai.</span><br><em data-i18n="how_h2em">Toliau — sistema.</em></h2>
+    <p class="section-sub" data-i18n="how_sub">Pradžia užtrunka apie dešimt minučių. Po to sistema dirba autonomiškai, be jokio tavo įsikišimo.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title" data-i18n="step2_title">Prijunk MT4 / MT5</div>
+        <div class="step-desc" data-i18n="step2_desc">Prijungi savo MT4/MT5 sąskaitą per MetaAPI — sistema automatiškai vykdys sandorius tavo vardu.</div>
+        <span class="step-tag" data-i18n="step2_tag">MetaAPI · Apsaugota</span>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title" data-i18n="step3_title">Sistema veikia.</div>
+        <div class="step-desc" data-i18n="step3_desc">Sandoriai vykdomi autonomiškai. Kiekvienas sandoris turi TP ir SL. Sistema uždaro automatiškai.</div>
+        <span class="step-tag" data-i18n="step3_tag">Autonomiškai · Realiuoju laiku</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDER SECTION -->
+<section style="padding: 80px 60px; background: var(--bg2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+  <div style="max-width: 860px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
+    <div>
+      <div class="section-eyebrow" data-i18n="founder_eyebrow">Kodėl sukūriau Aurora XAU</div>
+      <p style="font-size:15px;font-weight:300;color:var(--text);line-height:1.8;margin-bottom:20px;margin-top:24px;" data-i18n="founder_p1">
+        Anksčiau pats šokinėjau tarp strategijų, signalų ir porų.
+      </p>
+      <p style="font-size:15px;font-weight:300;color:var(--text);line-height:1.8;margin-bottom:20px;" data-i18n="founder_p2">
+        Didžiausia problema buvo emocijos.
+      </p>
+      <p style="font-size:15px;font-weight:300;color:var(--muted);line-height:1.8;margin-bottom:20px;" data-i18n="founder_p3">
+        Todėl pradėjau fokusuotis tik į XAUUSD ir kurti sistemą, kuri vykdytų taisykles be impulsyvių sprendimų.
+      </p>
+      <p style="font-size:15px;font-weight:300;color:var(--text);line-height:1.8;margin-bottom:32px;" data-i18n="founder_p4">
+        Šiandien tai pilnai automatizuota sistema, sukurta disciplinuotam, taisyklėmis pagrįstam prekiavimui.
+      </p>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--head);font-size:32px;font-weight:400;color:var(--gold2);" data-i18n="founder_stat1_num">3 strategijos</div>
+          <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);" data-i18n="founder_stat1_lbl">EMA · TL · 4H AI</div>
+        </div>
+        <div>
+          <div style="font-family:var(--head);font-size:32px;font-weight:400;color:var(--gold2);" data-i18n="founder_stat2_num">Tik XAUUSD</div>
+          <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);" data-i18n="founder_stat2_lbl">Specializacija</div>
+        </div>
+        <div>
+          <div style="font-family:var(--head);font-size:32px;font-weight:400;color:var(--gold2);" data-i18n="founder_stat3_num">Full-Stack</div>
+          <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);" data-i18n="founder_stat3_lbl">Portfolio projektas</div>
+        </div>
+      </div>
+    </div>
+    <div style="border: 1px solid var(--line2); padding: 36px; background: var(--bg);">
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;" data-i18n="founder_quote_label">Rizika</div>
+      <blockquote style="font-family:var(--head);font-size:22px;font-weight:400;font-style:italic;color:var(--text);line-height:1.5;margin-bottom:24px;" data-i18n="founder_quote">
+        „Forex nėra garantuotas pelnas.<br>Būna nuostolingų savaičių ir mėnesių.<br><br>Sistema orientuota į ilgalaikį stabilumą, o ne agresyvų pelną."
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO STRIP -->
+<div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03));border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:40px 60px;">
+  <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;">
+    <div>
+      <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;" data-i18n="demo_eyebrow">Išbandyk prieš pirkdamas</div>
+      <h2 style="font-size:clamp(24px,3vw,40px);margin-bottom:0;"><span data-i18n="demo_h2"></span><em data-i18n="demo_h2em"></em></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr;gap:16px;">
+      <div style="border:1px solid var(--line2);padding:24px 20px;background:var(--bg2);display:flex;flex-direction:column;">
+        <div style="font-size:28px;margin-bottom:10px;">🔬</div>
+        <div style="font-family:var(--head);font-size:16px;color:var(--gold2);margin-bottom:8px;" data-i18n="demo_card2_title">Pilnas automatizavimas</div>
+        <div style="font-size:13px;font-weight:300;color:var(--text);line-height:1.6;flex:1;" data-i18n="demo_card2_desc">Sistema vykdo sandorius autonomiškai — be rankinio įsikišimo. CopyFactory nukopijuoja kiekvieną sandorį į kliento sąskaitą realiuoju laiku.</div>
+        <a href="#" target="_blank" style="display:inline-flex;align-self:flex-start;align-items:center;gap:6px;margin-top:16px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-dim);padding-bottom:2px;" data-i18n="demo_card2_btn">Sužinoti daugiau →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MONTHLY PROFIT HISTORY -->
+<div style="background:var(--bg);border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:56px 60px;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;" data-i18n="monthly_eyebrow">Pelnas kiekvieną mėnesį</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:12px;">
+      <h2 style="font-size:clamp(22px,2.8vw,38px);margin:0;line-height:1.1;"><em data-i18n="monthly_h2">Mėnesio pelno istorija</em></h2>
+      <div style="font-size:12px;color:var(--muted);letter-spacing:0.5px;" data-i18n="monthly_period">Rgp 2025 – Liepa 2026</div>
+    </div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <div style="min-width:540px;">
+        <div style="display:flex;align-items:flex-end;gap:10px;height:200px;border-bottom:1px solid rgba(201,168,76,0.2);margin-bottom:10px;">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold-dim);margin-bottom:5px;white-space:nowrap;">+$1,750</div>
+            <div style="width:100%;height:18.1%;background:linear-gradient(0deg,rgba(201,168,76,0.15),rgba(201,168,76,0.35));border-top:1px solid rgba(201,168,76,0.5);"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold-dim);margin-bottom:5px;white-space:nowrap;">+$2,100</div>
+            <div style="width:100%;height:21.7%;background:linear-gradient(0deg,rgba(201,168,76,0.15),rgba(201,168,76,0.35));border-top:1px solid rgba(201,168,76,0.5);"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold-dim);margin-bottom:5px;white-space:nowrap;">+$2,340</div>
+            <div style="width:100%;height:24.2%;background:linear-gradient(0deg,rgba(201,168,76,0.15),rgba(201,168,76,0.35));border-top:1px solid rgba(201,168,76,0.5);"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold-dim);margin-bottom:5px;white-space:nowrap;">+$2,550</div>
+            <div style="width:100%;height:26.3%;background:linear-gradient(0deg,rgba(201,168,76,0.15),rgba(201,168,76,0.35));border-top:1px solid rgba(201,168,76,0.5);"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold-dim);margin-bottom:5px;white-space:nowrap;">+$2,990</div>
+            <div style="width:100%;height:30.9%;background:linear-gradient(0deg,rgba(201,168,76,0.15),rgba(201,168,76,0.35));border-top:1px solid rgba(201,168,76,0.5);"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold-dim);margin-bottom:5px;white-space:nowrap;">+$2,100</div>
+            <div style="width:100%;height:21.7%;background:linear-gradient(0deg,rgba(201,168,76,0.15),rgba(201,168,76,0.35));border-top:1px solid rgba(201,168,76,0.5);"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold-dim);margin-bottom:5px;white-space:nowrap;">+$3,100</div>
+            <div style="width:100%;height:32%;background:linear-gradient(0deg,rgba(201,168,76,0.15),rgba(201,168,76,0.35));border-top:1px solid rgba(201,168,76,0.5);"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold-dim);margin-bottom:5px;white-space:nowrap;">+$3,450</div>
+            <div style="width:100%;height:35.6%;background:linear-gradient(0deg,rgba(201,168,76,0.15),rgba(201,168,76,0.35));border-top:1px solid rgba(201,168,76,0.5);"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold-dim);margin-bottom:5px;white-space:nowrap;">+$3,660</div>
+            <div style="width:100%;height:37.8%;background:linear-gradient(0deg,rgba(201,168,76,0.15),rgba(201,168,76,0.35));border-top:1px solid rgba(201,168,76,0.5);"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold-dim);margin-bottom:5px;white-space:nowrap;">+$4,100</div>
+            <div style="width:100%;height:42.4%;background:linear-gradient(0deg,rgba(201,168,76,0.15),rgba(201,168,76,0.35));border-top:1px solid rgba(201,168,76,0.5);"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:9px;color:var(--gold2);font-weight:600;margin-bottom:5px;white-space:nowrap;">+$9,680</div>
+            <div style="width:100%;height:100%;background:linear-gradient(0deg,rgba(201,168,76,0.28),rgba(201,168,76,0.6));border-top:2px solid rgba(201,168,76,0.85);"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--muted);line-height:1.4;">Sep<br><span style="opacity:0.6;">'25</span></div>
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--muted);line-height:1.4;">Oct<br><span style="opacity:0.6;">'25</span></div>
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--muted);line-height:1.4;">Nov<br><span style="opacity:0.6;">'25</span></div>
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--muted);line-height:1.4;">Dec<br><span style="opacity:0.6;">'25</span></div>
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--muted);line-height:1.4;">Jan<br><span style="opacity:0.6;">'26</span></div>
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--muted);line-height:1.4;">Feb<br><span style="opacity:0.6;">'26</span></div>
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--muted);line-height:1.4;">Mar<br><span style="opacity:0.6;">'26</span></div>
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--muted);line-height:1.4;">Apr<br><span style="opacity:0.6;">'26</span></div>
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--muted);line-height:1.4;">May<br><span style="opacity:0.6;">'26</span></div>
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--muted);line-height:1.4;">Jun<br><span style="opacity:0.6;">'26</span></div>
+          <div style="flex:1;text-align:center;font-size:9px;color:var(--gold);font-weight:500;line-height:1.4;">Jul<br><span style="opacity:0.8;">'26</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;border-top:1px solid var(--line2);padding-top:24px;margin-top:32px;">
+      <div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;" data-i18n="monthly_total_lbl">Iš viso (11 mėn.)</div>
+        <div style="font-family:var(--head);font-size:28px;color:var(--gold2);">+$37,820</div>
+      </div>
+      <div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;" data-i18n="monthly_best_lbl">Geriausias mėnuo</div>
+        <div style="font-family:var(--head);font-size:28px;color:var(--gold2);" data-i18n="monthly_best_val">Liepa 2026 · +$9,680</div>
+      </div>
+      <div style="align-self:flex-end;">
+        <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-dim);border:1px solid var(--line2);padding:4px 10px;">⚠ Synthetic demo data</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRACK RECORD -->
+<section class="track-section" id="rezultatai">
+  <div class="section-inner">
+    <div class="section-eyebrow" data-i18n="track_eyebrow">Prekybos istorija</div>
+    <div id="open-trades-hero" style="margin:28px 0 18px;display:inline-flex;flex-direction:column;align-items:flex-start;gap:6px;border:1px solid rgba(201,168,76,0.14);padding:8px 16px;background:rgba(14,13,10,0.58);backdrop-filter:blur(10px);">
+      <span style="display:inline-flex;align-items:center;gap:10px;">
+        <span id="open-dot" style="width:7px;height:7px;border-radius:50%;background:#7a7060;flex-shrink:0;"></span>
+        <span data-i18n="open_trades_label" style="font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold-dim);">Šiuo metu atviri sandoriai</span>
+      </span>
+      <div id="open-trades-list" style="display:flex;flex-direction:column;gap:4px;"></div>
+    </div>
+    <div id="today-profit-hero" style="margin:0 0 18px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;border:1px solid rgba(201,168,76,0.14);padding:8px 16px;background:rgba(14,13,10,0.58);backdrop-filter:blur(10px);width:fit-content;">
+      <span data-i18n="today_profit_label" style="font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold-dim);">Šiandienos pelnas</span>
+      <span id="today-profit-value" style="font-size:22px;letter-spacing:0.5px;font-family:var(--head);color:#7a7060;">$0.00</span>
+    </div>
+
+    <!-- TRADES TABLE -->
+    <div class="trades-table-wrap" style="overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top:0; padding-top:0;">
+      <table class="trades-table">
+        <thead>
+          <tr>
+            <th data-i18n="th_dir">Kryptis</th>
+            <th data-i18n="th_lot">Lotai</th>
+            <th>Entry</th>
+            <th>Exit</th>
+            <th data-i18n="th_result">Rezultatas</th>
+            <th data-i18n="th_date">Data</th>
+          </tr>
+        </thead>
+        <tbody id="trades-body"></tbody>
+      </table>
+    </div>
+
+    <div class="monthly-profit-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+      <div class="monthly-profit-month" id="monthly-profit-month-label">Birželis 2026</div>
+      <div class="monthly-profit-value" id="monthly-profit-value">+$0.00</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="planai">
+  <div class="section-inner" style="text-align:center;margin-bottom:64px;">
+    <h2 style="margin-bottom:0"><em data-i18n="plans_h2em">Pradėk Šiandien!</em></h2>
+  </div>
+  <div class="plans">
+
+    <!-- PLAN: Mėnesinis -->
+    <div class="plan">
+      <span class="plan-tag" data-i18n="plan_monthly_tag">Mėnesinis</span>
+      <div class="plan-price"><sup>€</sup>399<sub data-i18n="plan_monthly_per">/mėn</sub></div>
+      <ul class="plan-features">
+        <li data-i18n="p3f0">Pilnas automatinis vykdymas</li>
+        <li data-i18n="p3f2">Automatinis sandorių vykdymas</li>
+        <li data-i18n="p3f3">MetaAPI — saugus MT4/MT5 prijungimas</li>
+        <li data-i18n="p3f4">Lankstus rizikos valdymas</li>
+        <li data-i18n="p3f5">Asmeninė konsultacija</li>
+        <li data-i18n="p3f6">Prioritetinis palaikymas</li>
+      </ul>
+      <button class="btn-plan btn-plan-outline" data-i18n="plan_monthly_btn" onclick="showDemoModal()">Rinktis Mėnesinis →</button>
+    </div>
+
+    <!-- PLAN: Automatinis Metinis -->
+    <div class="plan featured">
+      <span class="plan-tag" data-i18n="plan3_tag">Metams</span>
+      <div class="plan-price"><sup>€</sup>2599</div>
+      <span class="plan-save" data-i18n="plan3_save_new">Sutaupyk €2,189 METAMS</span>
+      <ul class="plan-features">
+        <li data-i18n="p3f0">Pilnas automatinis vykdymas</li>
+        <li data-i18n="p3f2">Automatinis sandorių vykdymas</li>
+        <li data-i18n="p3f3">MetaAPI — saugus MT4/MT5 prijungimas</li>
+        <li data-i18n="p3f4">Lankstus rizikos valdymas</li>
+        <li data-i18n="p3f5">Asmeninė konsultacija</li>
+        <li data-i18n="p3f6">Prioritetinis palaikymas</li>
+      </ul>
+      <button class="btn-plan btn-plan-solid" data-i18n="plan3_btn" onclick="showDemoModal()">Rinktis Metinis →</button>
+    </div>
+
+  </div>
+  <p style="text-align:center;font-size:12px;color:var(--text);margin-top:32px;letter-spacing:0.5px;" data-i18n="plans_note">
+    Saugus atsiskaitymas &nbsp;·&nbsp; Atšaukimas bet kada &nbsp;·&nbsp; Jokių paslėptų mokesčių
+  </p>
+  <p style="text-align:center;margin-top:20px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+    <a href="#" target="_blank" style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--gold);text-decoration:none;border:1px solid var(--gold-dim);padding:10px 24px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--gold-dim)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
+      <span data-i18n="plans_telegram">Klausimai? Telegram</span>
+    </a>
+  </p>
+
+  <!-- Deposit info -->
+  <div style="max-width:860px;margin:40px auto 0;border:1px solid var(--line);padding:32px 40px;background:var(--bg);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;">
+      <div>
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;" data-i18n="deposit_eyebrow">Rekomenduojami depozitai</div>
+        <div style="font-size:13px;font-weight:300;color:var(--muted);line-height:2;">
+          <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,0.06);padding:6px 0;">
+            <span style="color:var(--text);font-weight:400;">0.01 lot</span><span style="color:var(--gold2);">$400+</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,0.06);padding:6px 0;">
+            <span style="color:var(--text);font-weight:400;">0.02–0.06 lot</span><span style="color:var(--gold2);">$1,000+</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;">
+            <span style="color:var(--text);font-weight:400;">0.10 lot</span><span style="color:var(--gold2);">$2,000+</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text);margin-top:12px;line-height:1.6;" data-i18n="deposit_note">Tikslus minimumas priklauso nuo tavo brokerio leverage. Visada rekomenduojame daugiau — kuo didesnis buferis, tuo stabilesni rezultatai.</p>
+      </div>
+      <div style="border-left:1px solid var(--line);padding-left:40px;">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;" data-i18n="help_eyebrow">Reikia pagalbos?</div>
+        <p style="font-size:14px;font-weight:300;color:var(--text);line-height:1.8;margin-bottom:16px;" data-i18n="help_text">Neturi MT4/MT5 sąskaitos? Nežinai kaip pradėti? Padėsiu nuo A iki Z — nuo sąskaitos atidarymo iki pirmo sandorio.</p>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <a href="#" target="_blank" style="display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-dim);padding-bottom:3px;" data-i18n="help_btn">Rašyk Telegram →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding:100px 60px;background:var(--bg2);">
+  <div style="max-width:760px;margin:0 auto;">
+    <div class="section-eyebrow" data-i18n="faq_eyebrow">Dažni klausimai</div>
+    <h2 style="margin-bottom:48px;" data-i18n="faq_h2">Atsakymai į <em data-i18n="faq_h2em">dažniausiai užduodamus</em></h2>
+    <div id="faq-list"></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Aurora XAU</div>
+  <div class="footer-links">
+    <a href="legal.html" data-i18n="footer_privacy">Privatumo politika</a>
+    <a href="legal.html" data-i18n="footer_terms">Sąlygos</a>
+    <a href="#" target="_blank" data-i18n="footer_telegram">Telegram</a>
+  </div>
+  <p class="footer-disc" data-i18n="footer_disc">
+    Rizikos įspėjimas: prekyba finansinėmis priemonėmis susijusi su dideliu rizikos lygiu. Praeities rezultatai negarantuoja ateities grąžos. Aurora XAU teikia technologijų (copy trading programinės įrangos) paslaugą ir nėra licencijuotas finansų tarpininkas ar investicijų konsultantas. Ši paslauga nėra finansinė konsultacija. Investuokite tik tas lėšas, kurių praradimas nesukeltų finansinių sunkumų.
+  </p>
+</footer>
+
+
+<script>
+let currentLang = 'lt';
+checkMarketHours();
+setInterval(checkMarketHours, 60000);
+
+// REAL TRADES - populated from API
+let trades = [];
+
+// Synthetic demo trade data — shown immediately while API loads
+// All prices and results are fictional and for portfolio demonstration only.
+const STATIC_TRADES_RAW = [
+  {"closed_at":"2026-08-01 14:32:00+00","direction":"BUY", "entry":"2318.50","exit":"2328.50","profit": 10.0,"symbol":"XAUUSD","lot":"0.10","result":"TP1"},
+  {"closed_at":"2026-08-05 16:45:00+00","direction":"SELL","entry":"2345.20","exit":"2335.20","profit": 10.0,"symbol":"XAUUSD","lot":"0.10","result":"TP1"},
+  {"closed_at":"2026-08-10 10:15:00+00","direction":"BUY", "entry":"2301.00","exit":"2291.00","profit":-10.0,"symbol":"XAUUSD","lot":"0.10","result":"SL"},
+  {"closed_at":"2026-08-15 18:22:00+00","direction":"SELL","entry":"2378.90","exit":"2368.90","profit": 10.0,"symbol":"XAUUSD","lot":"0.10","result":"TP1"},
+  {"closed_at":"2026-08-18 11:30:00+00","direction":"BUY", "entry":"2290.50","exit":"2300.50","profit": 10.0,"symbol":"XAUUSD","lot":"0.10","result":"TP1"},
+  {"closed_at":"2026-08-20 14:10:00+00","direction":"SELL","entry":"2355.00","exit":"2365.00","profit":-10.0,"symbol":"XAUUSD","lot":"0.10","result":"SL"},
+  {"closed_at":"2026-08-22 09:45:00+00","direction":"BUY", "entry":"2310.20","exit":"2320.20","profit": 10.0,"symbol":"XAUUSD","lot":"0.10","result":"TP1"},
+  {"closed_at":"2026-08-25 15:00:00+00","direction":"SELL","entry":"2340.60","exit":"2330.60","profit": 10.0,"symbol":"XAUUSD","lot":"0.10","result":"TP1"}
+];
+
+function mapRawTrade(t) {
+  const profitVal = t.profit != null ? parseFloat(t.profit) : null;
+  let profit = '';
+  if (profitVal != null && Number.isFinite(profitVal)) {
+    profit = (profitVal >= 0 ? '+' : '-') + '$' + Math.abs(profitVal).toFixed(2);
+  }
+  let date = '';
+  if (t.closed_at) {
+    const d = new Date(t.closed_at);
+    const mo  = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const h   = String(d.getUTCHours()).padStart(2, '0');
+    const m   = String(d.getUTCMinutes()).padStart(2, '0');
+    date = mo + '-' + day + ' ' + h + ':' + m;
+  }
+  const canceled = t.result === 'Atšauktas' || t.result === 'Canceled';
+  return {
+    pair:      t.symbol ? t.symbol.replace('XAUUSD', 'XAU/USD') : 'XAU/USD',
+    dir:       (t.direction || 'BUY').toUpperCase(),
+    lot:       t.lot ? parseFloat(t.lot).toFixed(2) : '0.10',
+    entry:     t.entry ? parseFloat(t.entry).toFixed(2) : '',
+    exit:      t.exit  ? parseFloat(t.exit).toFixed(2)  : '',
+    profit,
+    profitRaw: (profitVal != null && Number.isFinite(profitVal)) ? profitVal : null,
+    pos:       profitVal != null ? profitVal > 0 : false,
+    date,
+    closedAt:  t.closed_at || null,
+    status:    canceled ? 'Atšauktas' : (t.result || ''),
+  };
+}
+
+// Load static data immediately so calendar shows before API responds
+trades = STATIC_TRADES_RAW.map(mapRawTrade);
+
+const LT_MONTHS = ['Sausis','Vasaris','Kovas','Balandis','Gegužė','Birželis','Liepa','Rugpjūtis','Rugsėjis','Spalis','Lapkritis','Gruodis'];
+const LT_MONTHS_GEN = ['Sausio','Vasario','Kovo','Balandžio','Gegužės','Birželio','Liepos','Rugpjūčio','Rugsėjo','Spalio','Lapkričio','Gruodžio'];
+const EN_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+async function fetchTradeHistory() {
+  try {
+    const res = await fetch('/api/demo/trades');
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+    trades = data.map(mapRawTrade);
+    renderTrades(currentLang);
+  } catch(e) {
+    console.error('Trade history fetch error:', e);
+  }
+}
+fetchTradeHistory();
+
+// CURRENT OPEN TRADES - populated from API
+let openTrades = [];
+
+function updateOpenTrades(trades) {
+  const dot = document.getElementById('open-dot');
+  const list = document.getElementById('open-trades-list');
+  if (!trades || trades.length === 0) {
+    dot.style.background = '#7a7060';
+    dot.style.animation = 'none';
+    list.innerHTML = `<span style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#7a7060;">${currentLang === 'en' ? 'No open trades at this time' : 'Šiuo metu atvirų sandorių nėra'}</span>`;
+  } else {
+    dot.style.background = '#4dff91';
+    dot.style.animation = 'pulseDot 2s infinite';
+    list.innerHTML = trades.map(t => {
+      const profit = Number(t.profit);
+      const hasProfit = Number.isFinite(profit) && profit !== 0;
+      const isPositive = profit >= 0;
+      const profitText = hasProfit ? (isPositive ? '+$' : '-$') + Math.abs(profit).toFixed(2) : null;
+      const color = profitText ? (isPositive ? '#4dff91' : '#ff7070') : '#b0a080';
+      const baseLabel = currentLang === 'en' ? 'Active position' : 'Aktyvi pozicija';
+      const label = profitText ? `${baseLabel} · ${profitText}` : baseLabel;
+      return `<div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:${color};">${label}</div>`;
+    }).join('');
+  }
+}
+
+updateOpenTrades(openTrades);
+
+async function fetchOpenTrades() {
+  try {
+    const res = await fetch('/api/demo/open-trades');
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      openTrades = data.map(t => ({
+        pair:   t.symbol || 'XAU/USD',
+        dir:    (t.direction || 'BUY').toUpperCase(),
+        lot:    t.lot || '0.10',
+        entry:  t.entry || '',
+        profit: t.profit,
+        opened: t.opened_at ? new Date(t.opened_at).toLocaleDateString('en-US', {month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'}) : ''
+      }));
+      updateOpenTrades(openTrades);
+    }
+  } catch(e) {
+    console.error('Trades fetch error:', e);
+  }
+}
+fetchOpenTrades();
+setInterval(fetchOpenTrades, 30000);
+
+async function fetchMonthlyPnl() {
+  try {
+    const res = await fetch('/api/demo/pnl/monthly');
+    const data = await res.json();
+    const el = document.getElementById('monthly-profit-value');
+    if (el && data.total_profit !== undefined) {
+      if (data.trade_count > 0) {
+        const val = parseFloat(data.total_profit);
+        el.textContent = (val >= 0 ? '+$' : '-$') + Math.abs(val).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      } else {
+        el.textContent = '+$0.00';
+      }
+    }
+  } catch(e) {
+    console.error('PnL fetch error:', e);
+  }
+}
+fetchMonthlyPnl();
+
+function renderTrades(lang) {
+  const tbody = document.getElementById('trades-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const last10 = trades.filter(t => t.status !== 'Atšauktas' && t.closedAt).slice(0, 10);
+  last10.forEach(t => {
+    const isCanceled = t.status === 'Atšauktas';
+    const profitStr = t.profit || '';
+    const rezultatasContent = isCanceled
+      ? `<span style="color:var(--muted)">${lang === 'en' ? 'Canceled' : 'Atšauktas'}</span>`
+      : profitStr;
+    const rezultatasClass = isCanceled ? '' : `t-profit ${t.pos ? 'pos' : 'neg'}`;
+    tbody.innerHTML += `<tr>
+      <td class="${t.dir==='BUY'?'t-buy':'t-sell'}">${t.dir}</td>
+      <td style="color:var(--muted);font-size:12px">${t.lot}</td>
+      <td style="color:var(--muted)">${t.entry}</td>
+      <td style="color:var(--muted)">${t.exit}</td>
+      <td class="${rezultatasClass}">${rezultatasContent}</td>
+      <td class="t-date">${t.date}</td>
+    </tr>`;
+  });
+}
+
+renderTrades(currentLang);
+
+async function fetchTodayPnl() {
+  try {
+    const res = await fetch('/api/demo/pnl/today');
+    const data = await res.json();
+    const el = document.getElementById('today-profit-value');
+    if (!el || data.total_profit === undefined) return;
+    const val = parseFloat(data.total_profit);
+    el.textContent = val > 0 ? '+$' + val.toFixed(2) : val < 0 ? '-$' + Math.abs(val).toFixed(2) : '$0.00';
+    el.style.color = val > 0 ? '#4dff91' : val < 0 ? '#ff7070' : '#7a7060';
+  } catch(e) {
+    console.error('Today PnL fetch error:', e);
+  }
+}
+fetchTodayPnl();
+
+let heroPnl = { today: null, monthly: null };
+
+function updateHeroPnl() {
+  const todayLbl = document.getElementById('hero-pnl-today-label');
+  const todayVal = document.getElementById('hero-pnl-today-value');
+  const monthLbl = document.getElementById('hero-pnl-month-label');
+  const monthVal = document.getElementById('hero-pnl-month-value');
+  if (!todayVal || !monthVal) return;
+  const fmt = v => v > 0 ? '+$' + v.toFixed(2) : v < 0 ? '-$' + Math.abs(v).toFixed(2) : '$0.00';
+  const color = v => v > 0 ? '#4dff91' : v < 0 ? '#ff7070' : '#7a7060';
+  const mo = new Date().getMonth();
+  if (heroPnl.today !== null) {
+    todayVal.textContent = fmt(heroPnl.today);
+    todayVal.style.color = color(heroPnl.today);
+  }
+  if (heroPnl.monthly !== null) {
+    monthVal.textContent = fmt(heroPnl.monthly);
+    monthVal.style.color = color(heroPnl.monthly);
+  }
+  if (currentLang === 'en') {
+    if (todayLbl) todayLbl.textContent = "Today's profit";
+    if (monthLbl) monthLbl.textContent = EN_MONTHS[mo] + ' profit';
+  } else {
+    if (todayLbl) todayLbl.textContent = 'Šiandienos pelnas';
+    if (monthLbl) monthLbl.textContent = LT_MONTHS_GEN[mo] + ' pelnas';
+  }
+}
+
+function updateMonthlyCardLabel(lang) {
+  const label = (lang === 'en' ? EN_MONTHS[new Date().getMonth()] : LT_MONTHS[new Date().getMonth()]) + ' ' + new Date().getFullYear();
+  const el = document.getElementById('monthly-profit-month-label');
+  if (el) el.textContent = label;
+}
+
+async function fetchHeroPnl() {
+  try {
+    const [todayRes, monthRes] = await Promise.all([
+      fetch('/api/demo/pnl/today'),
+      fetch('/api/demo/pnl/monthly'),
+    ]);
+    const todayData = await todayRes.json();
+    const monthData = await monthRes.json();
+    if (todayData.total_profit !== undefined) heroPnl.today = parseFloat(todayData.total_profit);
+    if (monthData.total_profit !== undefined) heroPnl.monthly = parseFloat(monthData.total_profit);
+    updateHeroPnl();
+  } catch(e) {
+    console.error('Hero PnL fetch error:', e);
+  }
+}
+fetchHeroPnl();
+setInterval(fetchHeroPnl, 60000);
+
+// Monthly summary - updated data
+const monthly = [
+  { month:'Gegužė 2026',   month_en:'May 2026',       pct:74, profit:3100.10 },
+  { month:'Balandis 2026', month_en:'April 2026',     pct:65, profit:2697.49 },
+  { month:'Kovas 2026',    month_en:'March 2026',     pct:73, profit:2979.32 },
+  { month:'Vasaris 2026',  month_en:'February 2026',  pct:68, profit:2778.01 },
+  { month:'Sausis 2026',   month_en:'January 2026',   pct:71, profit:2898.79 },
+  { month:'Gruodis 2025',  month_en:'December 2025',  pct:70, profit:2858.53 },
+  { month:'Lapkritis 2025',month_en:'November 2025',  pct:72, profit:2939.06 },
+  { month:'Spalis 2025',   month_en:'October 2025',   pct:69, profit:2818.27 },
+  { month:'Rugsėjis 2025', month_en:'September 2025', pct:71, profit:2898.79 },
+];
+const avg = Math.round(monthly.reduce((s,m)=>s+m.pct,0)/monthly.length);
+function renderMonthly(lang) {
+  const mGrid = document.getElementById('monthly-grid');
+  if(!mGrid) return;
+  mGrid.innerHTML = '';
+  monthly.forEach(m => {
+    const label = lang === 'en' ? m.month_en : m.month;
+    mGrid.innerHTML += `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+        <span style="color:var(--muted)">${label}</span>
+        <span style="color:var(--gold2);font-family:var(--head)">+${m.pct}%</span>
+      </div>
+      <div style="height:3px;background:rgba(201,168,76,0.1);border-radius:2px;">
+        <div style="height:100%;width:${m.pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;"></div>
+      </div>
+    </div>`;
+  });
+}
+function renderProfitGrid(lang) {
+  const pGrid = document.getElementById('profit-grid');
+  if(!pGrid) return;
+  pGrid.innerHTML = '';
+  const maxProfit = 3100.10;
+  monthly.forEach(m => {
+    const label = lang === 'en' ? m.month_en : m.month;
+    const pct = Math.round(m.profit / maxProfit * 100);
+    pGrid.innerHTML += `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+        <span style="color:var(--muted)">${label}</span>
+        <span style="color:var(--gold2);font-family:var(--head)">+$${m.profit.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      </div>
+      <div style="height:3px;background:rgba(201,168,76,0.1);border-radius:2px;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;"></div>
+      </div>
+    </div>`;
+  });
+}
+renderMonthly(currentLang);
+renderProfitGrid(currentLang);
+
+// FAQ
+const faqs = {
+  lt: [
+    { q:'Koks minimalus depozitas reikalingas?', a:'Rekomenduojame bent $400 — taip sistema gali tinkamai valdyti riziką su 0.01 lot dydžiu.' },
+    { q:'Kokį brokerį rekomenduojate?', a:'Sistema veikia su bet kokiu brokeriu kuris palaiko MT4 arba MT5. Nėra jokių apribojimų — pasirink brokerį kuriuo jau pasitiki.' },
+    { q:'Ar galiu išbandyti prieš mokėdamas?', a:'Taip — ši portfolio versija demonstruoja sistemos principus su sintetiniais demo duomenimis. Realūs mokėjimai nėra portfolio versijoje.' },
+    { q:'Ar yra Stop Loss kiekviename sandoryje?', a:'Taip — kiekvienas sandoris turi TP ir SL nuo pat pradžių. Sistema uždaro automatiškai.' },
+    { q:'Kiek laiko užtrunka prijungimas?', a:'Apie 10 minučių. Sumoki, gauni nuorodą, prijungi savo MT4/MT5 sąskaitą per MetaAPI — viskas. Automatinis planas pradeda veikti iš karto.' },
+    { q:'Ar galiu sustabdyti automatinį kopijavimą?', a:'Taip. Galite bet kada sustabdyti arba aktyvuoti kopijavimą per Telegram botą — tiesiog parašykite /stop arba /start. Nereikia įvesti nei sąskaitos numerio, nei el. pašto — botas automatiškai atpažįsta jus. Esami atviri sandoriai liks atviri kol pasieks TP/SL, arba galite juos uždaryti rankiniu būdu savo brokerio platformoje.' },
+    { q:'Kiek sandorių būna per dieną?', a:'Nuo 0 iki kelių — priklauso nuo rinkos sąlygų. Sistema prekiauja tik kai yra aiškus signalas. Kokybė svarbiau nei kiekybė.' },
+    { q:'Ar sistema dirba naktį ir savaitgaliais?', a:'Sistema dirba kartu su aukso rinka — pirmadienis–penktadienis, 24 valandas per parą. Savaitgaliais rinka uždaryta, sandoriai nevykdomi.' },
+    { q:'Kas atsitinka jei interneto ryšys nutrūksta?', a:'Sistema veikia mūsų serveriuose, ne tavo kompiuteryje — interneto ryšys tavo pusėje neturi įtakos sandorių vykdymui.' },
+    { q:'Koks maksimalus lot dydis?', a:'Standartiškai siūlome iki 0.10 lot. Jei nori didesnio — susisiek per Telegram, aptarsime individualiai.' },
+    { q:'Ar galiu turėti kelias MT4/MT5 sąskaitas?', a:'Viena prenumerata — viena sąskaita. Papildomoms sąskaitoms reikia atskiros prenumeratos.' },
+  ],
+  en: [
+    { q:'What is the minimum deposit required?', a:'We recommend at least $400 — this allows the system to manage risk properly with 0.01 lot size.' },
+    { q:'Which broker do you recommend?', a:'The system works with any broker that supports MT4 or MT5. There are no restrictions — choose the broker you already trust.' },
+    { q:'Can I try before paying?', a:'Yes — this portfolio version demonstrates the system with synthetic demo data. No real payments are involved in this public version.' },
+    { q:'Is there a Stop Loss on every trade?', a:'Yes — every trade has both a TP and SL set from the start. The system closes automatically.' },
+    { q:'How long does setup take?', a:'About 10 minutes. Pay, receive your setup link, connect your MT4/MT5 account through MetaAPI — done. The Automated plan starts working immediately.' },
+    { q:'Can I pause automated copy trading?', a:'Yes. You can pause or resume copy trading at any time via the Telegram bot — simply send /stop or /start. No account number or email needed — the bot recognises you automatically. Any open trades will remain open until they reach TP/SL, or you can close them manually on your broker platform.' },
+    { q:'How many trades per day?', a:'From 0 to several — depends on market conditions. The system trades only when there is a clear signal. Quality over quantity.' },
+    { q:'Does the system work at night and on weekends?', a:'The system operates alongside the gold market — Monday–Friday, 24 hours a day. On weekends the market is closed and no trades are executed.' },
+    { q:'What happens if my internet connection drops?', a:'The system runs on our servers, not your computer — your internet connection has no impact on trade execution.' },
+    { q:'What is the maximum lot size?', a:'We typically offer up to 0.10 lot. If you need more — contact us on Telegram and we will discuss individually.' },
+    { q:'Can I have multiple MT4/MT5 accounts?', a:'One subscription — one account. Additional accounts require a separate subscription.' },
+  ]
+};
+
+function renderFaq(lang) {
+  const list = document.getElementById('faq-list');
+  if (!list) return;
+  list.innerHTML = '';
+  faqs[lang].forEach((f, i) => {
+    list.innerHTML += `
+    <div style="border-bottom:1px solid var(--line);padding:20px 0;" id="faq-${i}">
+      <div onclick="toggleFaq(${i})" style="display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer;">
+        <span style="font-family:var(--head);font-size:18px;font-weight:400;color:var(--text);">${f.q}</span>
+        <span id="faq-icon-${i}" style="color:var(--gold);font-size:20px;font-weight:300;flex-shrink:0;transition:transform 0.2s;">+</span>
+      </div>
+      <div id="faq-ans-${i}" style="display:none;font-size:14px;font-weight:300;color:var(--text);line-height:1.8;margin-top:14px;">${f.a}</div>
+    </div>`;
+  });
+}
+
+function toggleFaq(i) {
+  const ans = document.getElementById('faq-ans-'+i);
+  const icon = document.getElementById('faq-icon-'+i);
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  icon.textContent = open ? '+' : '×';
+  icon.style.transform = open ? 'rotate(0deg)' : 'rotate(0deg)';
+}
+
+document.addEventListener('DOMContentLoaded', function() { setLang('lt'); renderTrades('lt'); });
+
+// Override setLang to also re-render FAQ
+function checkMarketHours() {
+  const now = new Date();
+  const vilnius = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Vilnius' }));
+  const day = vilnius.getDay();    // 0=Sun, 1=Mon … 6=Sat
+  const hour = vilnius.getHours(); // 0–23
+  // Closed: Saturday, Sunday, and 00:00–00:59 Lithuania time on any weekday
+  const isClosed = day === 0 || day === 6 || hour === 0;
+  const block = document.getElementById('live-price-block');
+  const label = document.getElementById('market-status-label');
+  if (isClosed) {
+    block && block.classList.add('market-closed');
+    if (label) { label.className = 'market-status-label market-closed-label'; label.textContent = currentLang === 'en' ? 'Market Closed' : 'Rinka uždaryta'; }
+  } else {
+    block && block.classList.remove('market-closed');
+    if (label) { label.className = 'market-status-label market-open'; label.textContent = currentLang === 'en' ? 'Market Open' : 'Rinka atidaryta'; }
+  }
+  return isClosed;
+}
+
+// Update equity big number with calculated avg
+const equityBig = document.querySelector('.equity-big');
+if(equityBig) equityBig.innerHTML = `<span>+</span>${avg}%`;
+
+updateHeroPnl();
+
+// ── Demo modal ────────────────────────────────────────────────────────────────
+function showDemoModal() {
+  let overlay = document.getElementById('demo-payment-modal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'demo-payment-modal';
+    overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);z-index:2000;align-items:center;justify-content:center;padding:24px;';
+    overlay.innerHTML = `
+      <div style="background:var(--bg2);border:1px solid var(--line2);padding:48px 40px;max-width:440px;width:100%;position:relative;text-align:center;">
+        <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">Portfolio Demo</div>
+        <div style="font-family:var(--head);font-size:28px;font-weight:300;color:var(--text);margin-bottom:12px;">Demo Mode</div>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:28px;">
+          This is a portfolio/demo version. Real Stripe payment links are not included in this public repository.<br><br>
+          In production, this button redirects to a Stripe Checkout page for subscription billing.
+        </p>
+        <div style="border:1px solid var(--line);padding:16px;margin-bottom:28px;font-size:13px;color:var(--muted);line-height:1.6;">
+          Integration: <span style="color:var(--gold2);">Stripe Checkout → Webhook → Supabase → MetaAPI onboarding</span>
+        </div>
+        <button onclick="document.getElementById('demo-payment-modal').style.display='none'" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--bg);border:none;padding:14px 40px;font-family:var(--body);font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Close</button>
+      </div>`;
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.style.display = 'none'; });
+    document.body.appendChild(overlay);
+  } else {
+    overlay.style.display = 'flex';
+  }
+}
+
+</script>
+<script>
+const i18n = {
+  lt: {
+    nav_how:'Kaip veikia', nav_results:'Rezultatai', nav_plans:'Planai', nav_cta:'Pradėti',
+    hero_eyebrow:'',
+    hero_h1:'Prekiauju tik XAUUSD,', hero_h1em:'sukurtas kaip portfolio projektas',
+    hero_sub:'',
+    hero_desc:'Ne pažadai apie greitą pelną. Tik realūs sandoriai, aiški rizika ir disciplina.',
+    hero_cta1:'Pradėti dabar', hero_cta2:'Žiūrėti rezultatus', open_trades_label:'Šiuo metu atviri sandoriai', today_profit_label:'Šiandienos pelnas',
+    stat1:'Laimėjimų rodiklis', stat2:'Maks. drawdown', stat3:'Pelno koeficientas', stat4:'Mėnesiai aktyvus',
+    how_eyebrow:'Procesas',
+    how_h2:'Du žingsniai.', how_h2em:'Toliau — sistema.',
+    how_sub:'Pradžia užtrunka apie dešimt minučių. Po to sistema dirba autonomiškai, be jokio tavo įsikišimo.',
+    step1_title:'Pasirink planą', step1_desc:'Pasirink tinkamą lygį ir atlik saugų atsiskaitymą. Prieiga suteikiama automatiškai per kelias minutes.', step1_tag:'Saugus atsiskaitymas',
+    step2_title:'Prijunk MT4 / MT5', step2_desc:'Prijungi savo MT4/MT5 sąskaitą per MetaAPI — sistema automatiškai vykdys sandorius tavo vardu.', step2_tag:'MetaAPI · Apsaugota',
+    step3_title:'Sistema veikia.', step3_desc:'Sandoriai vykdomi autonomiškai. Kiekvienas sandoris turi TP ir SL. Sistema uždaro automatiškai.', step3_tag:'Autonomiškai · Realiuoju laiku',
+    profit_label:'Pelnas', myfxbook_label:'Nepriklausomas auditas', myfxbook_verified:'Patvirtinta Myfxbook', myfxbook_gain:'Pelnas', myfxbook_winrate:'Laimėjimų rodiklis', myfxbook_pf:'Pelno koeficientas',
+    track_eyebrow:'Prekybos istorija', track_h2:'Paskutiniai', track_h2em:'sandoriai',
+    th_pair:'Pora', th_dir:'Kryptis', th_lot:'Lotai', th_result:'Rezultatas', th_date:'Data (UTC+3)', th_status:'Statusas',
+    month_eyebrow:'Laimėjimų rodiklis', month_profit_label:'Mėnesio pelnas',
+    equity_label:'Laimėjimų rodiklis', equity_period:'Rugsėjis 2025 — Gegužė 2026 · Demo duomenys', profit_period:'Rugsėjis 2025 — Gegužė 2026', lot_note2:'Pozicijos dydis — 0.1 lot',
+    founder_eyebrow:'Kodėl sukūriau Aurora XAU', founder_h2:'', founder_h2em:'',
+    founder_p1:'Anksčiau pats šokinėjau tarp strategijų, signalų ir porų.',
+    founder_p2:'Didžiausia problema buvo emocijos.',
+    founder_p3:'Todėl pradėjau fokusuotis tik į XAUUSD ir kurti sistemą, kuri vykdytų taisykles be impulsyvių sprendimų.',
+    founder_p4:'Šiandien tai portfolio projektas, demonstruojantis full-stack automatizavimą.',
+    founder_stat1_num:'3 strat.', founder_stat1_lbl:'Strategijos',
+    monthly_eyebrow:'Pelnas kiekvieną mėnesį', monthly_h2:'Mėnesio pelno istorija', monthly_period:'Rgp 2025 – Liepa 2026', monthly_total_lbl:'Iš viso (11 mėn.)', monthly_best_lbl:'Geriausias mėnuo', monthly_best_val:'Liepa 2026 · +$9,680',
+    founder_stat2_num:'Tik XAUUSD', founder_stat2_lbl:'Specializacija',
+    founder_stat3_num:'Demo', founder_stat3_lbl:'Portfolio versija',
+    founder_quote_label:'Rizika',
+    founder_quote:'„Forex nėra garantuotas pelnas.<br>Būna nuostolingų savaičių ir mėnesių.<br><br>Sistema orientuota į ilgalaikį stabilumą, o ne agresyvų pelną."',
+    founder_title:'Aurora XAU · XAUUSD Trader',
+    demo_eyebrow:'Išbandyk prieš pirkdamas', demo_h2:'', demo_h2em:'',
+    demo_card1_title:'Išmėgink prieš pirkdamas', demo_card1_desc:'Rašyk į Telegram — stebėk sandorius realiuoju laiku.', demo_card1_btn:'Telegram →',
+    demo_card2_title:'Portfolio demonstracija', demo_card2_desc:'Ši versija naudoja sintetinius demo duomenis. Realūs mokėjimai ar garantijos nėra portfolio versijoje.', demo_card2_btn:'Sužinoti daugiau →',
+    faq_eyebrow:'Dažni klausimai', faq_h2:'Atsakymai į', faq_h2em:'dažniausiai užduodamus',
+    plans_eyebrow:'Planai', plans_h2:'', plans_h2em:'Pradėk Šiandien!',
+    per_month:'/mėn', per_month2:'/mėn',
+    plan2_badge:'Rekomenduojama',
+    plan2_next_price:'Kita kaina €249/mėn',
+    plan2_desc:'Visiškai automatinis trading. Prijungi savo MT4/MT5 sąskaitą per MetaAPI — sistema prekiauja vietoj tavęs. Jokio ekrano stebėjimo. Galite sustabdyti bet kada per Telegram (skaityti DUK skiltyje)',
+    p2f0:'Pilnas automatinis vykdymas', p2f1:'Telegram pranešimai', p2f2:'Automatinis sandorių vykdymas', p2f3:'MetaAPI — saugus MT4/MT5 prijungimas', p2f4:'Lankstus rizikos valdymas', p2f5:'Asmeninė konsultacija', p2f6:'Prioritetinis palaikymas',
+    plan2_btn:'Rinktis Automatinis →',
+    plan_monthly_tag:'Mėnesinis', plan_monthly_per:'/mėn', plan_monthly_btn:'Rinktis Mėnesinis →',
+    plan3_tag:'Metams', plan3_badge:'',
+    plan3_save_new:'Sutaupyk €2,189 METAMS',
+    plan3_save:'Sutaupote €1,198/metus', plan3_billed:'Mokama €1,790/metus',
+    plan3_desc:'Visas Automatinis plano funkcionalumas — mokant už metus iš karto. Sutaupote 40% lyginant su mėnesiniu planu.',
+    p3f0:'Pilnas automatinis vykdymas', p3f1:'Viskas iš Automatinis plano', p3f2:'Automatinis sandorių vykdymas', p3f3:'MetaAPI — saugus MT4/MT5 prijungimas', p3f4:'Lankstus rizikos valdymas', p3f5:'Asmeninė konsultacija', p3f6:'Prioritetinis palaikymas',
+    plan3_btn:'Rinktis Metinis →',
+    per_month3:'/mėn',
+    plans_note:'Saugus atsiskaitymas · Atšaukimas bet kada · Jokių paslėptų mokesčių',
+    plans_telegram:'Klausimai? Telegram',
+    trust1_desc:'MT4/MT5 sąskaita prijungiama per saugų MetaAPI ryšį. Automatiniam kopijavimui reikalingas pagrindinis/prekybinis slaptažodis, ne tik stebėjimui skirtas read-only slaptažodis.',
+    trust2_title:'Skaidri sandorių istorija', trust2_desc:'Visi rodomi rezultatai yra sintetiniai demo duomenys, skirti portfolio demonstracijai.',
+    trust3_title:'Viena pora — ekspertizė', trust3_desc:'Prekiaujame tik XAUUSD — auksu. Gilus supratimas vienos rinkos yra stipresnis nei paviršutinis visų.',
+    deposit_eyebrow:'Rekomenduojami depozitai', deposit_note:'Tikslus minimumas priklauso nuo tavo brokerio leverage. Visada rekomenduojame daugiau — kuo didesnis buferis, tuo stabilesni rezultatai.',
+    help_eyebrow:'Reikia pagalbos?', help_text:'Neturi MT4/MT5 sąskaitos? Nežinai kaip pradėti? Padėsiu nuo A iki Z — nuo sąskaitos atidarymo iki pirmo sandorio.', help_btn:'Rašyk Telegram →',
+    footer_privacy:'Privatumo politika', footer_terms:'Sąlygos', footer_telegram:'Telegram', footer_contact:'Kontaktai',
+    footer_disc:'Rizikos įspėjimas: prekyba finansinėmis priemonėmis susijusi su dideliu rizikos lygiu. Praeities rezultatai negarantuoja ateities grąžos. Aurora XAU teikia technologijų (copy trading programinės įrangos) paslaugą ir nėra licencijuotas finansų tarpininkas ar investicijų konsultantas. Ši paslauga nėra finansinė konsultacija. Investuokite tik tas lėšas, kurių praradimas nesukeltų finansinių sunkumų.',
+  },
+  en: {
+    nav_how:'How it works', nav_results:'Results', nav_plans:'Plans', nav_cta:'Get started',
+    hero_eyebrow:'',
+    hero_h1:'I trade only XAUUSD,', hero_h1em:'built as a full-stack portfolio project',
+    hero_sub:'',
+    hero_desc:'No promises of quick profits. Only real trades, clear risk and discipline.',
+    hero_cta1:'Get started', hero_cta2:'View results', open_trades_label:'Current trades', today_profit_label:"Today's profit",
+    stat1:'Win rate', stat2:'Max drawdown', stat3:'Profit factor', stat4:'Months live',
+    how_eyebrow:'Process',
+    how_h2:'Two steps.', how_h2em:'Then — the system.',
+    how_sub:'Setup takes about ten minutes. After that the system runs autonomously, without any input from you.',
+    step1_title:'Choose a plan', step1_desc:'Select your tier and complete a secure payment. Access is granted automatically within minutes.', step1_tag:'Secure payment',
+    step2_title:'Connect MT4 / MT5', step2_desc:'Connect your MT4/MT5 account through MetaAPI — the system will execute trades automatically on your behalf.', step2_tag:'MetaAPI · Protected',
+    step3_title:'System runs.', step3_desc:'Trades execute autonomously. Every trade has a TP and SL set from the start. The system closes automatically.', step3_tag:'Autonomous · Real-time',
+    profit_label:'Profit', myfxbook_label:'Independent audit', myfxbook_verified:'Verified by Myfxbook', myfxbook_gain:'Gain', myfxbook_winrate:'Win Rate', myfxbook_pf:'Profit Factor',
+    track_eyebrow:'Trade history', track_h2:'Recent', track_h2em:'trades',
+    th_pair:'Pair', th_dir:'Direction', th_lot:'Lots', th_result:'Result', th_date:'Date (UTC+3)', th_status:'Status',
+    lot_note:'Position size — 0.1 lot · Last 10 trades',
+    month_eyebrow:'Win rate', month_profit_label:'Monthly profit',
+    equity_label:'Win rate', equity_period:'Sep 2025 — May 2026 · Demo data', profit_period:'Sep 2025 — May 2026', lot_note2:'Position size — 0.1 lot',
+    founder_eyebrow:'Why I built Aurora XAU', founder_h2:'', founder_h2em:'',
+    founder_p1:'I used to jump between strategies, signals and pairs.',
+    founder_p2:'The biggest problem was emotions.',
+    founder_p3:'So I started focusing only on XAUUSD and building a system that executes rules without impulsive decisions.',
+    founder_p4:'Today this is a portfolio project demonstrating full-stack trading automation.',
+    founder_stat1_num:'3 strat.', founder_stat1_lbl:'Strategies',
+    monthly_eyebrow:'Profit every month', monthly_h2:'Monthly profit history', monthly_period:'Sep 2025 – July 2026', monthly_total_lbl:'Total (11 mo.)', monthly_best_lbl:'Best month', monthly_best_val:'July 2026 · +$9,680',
+    founder_stat2_num:'XAUUSD only', founder_stat2_lbl:'Specialisation',
+    founder_stat3_num:'Demo', founder_stat3_lbl:'Portfolio version',
+    founder_quote_label:'Risk',
+    founder_quote:'"Forex is not guaranteed profit.<br>There are losing weeks and months.<br><br>The system is focused on long-term stability, not aggressive gains."',
+    founder_title:'Aurora XAU · XAUUSD Trader',
+    demo_eyebrow:'Try before you buy', demo_h2:'', demo_h2em:'',
+    demo_card1_title:'Try before you buy', demo_card1_desc:'Message on Telegram — watch the system trade in real time.', demo_card1_btn:'Telegram →',
+    demo_card2_title:'Portfolio demonstration', demo_card2_desc:'This version uses synthetic demo data. No real payments or guarantees are present in this portfolio version.', demo_card2_btn:'Learn more →',
+    faq_eyebrow:'FAQ', faq_h2:'Answers to', faq_h2em:'common questions',
+    plans_eyebrow:'Plans', plans_h2:'', plans_h2em:'Start Today!',
+    per_month:'/mo', per_month2:'/mo',
+    plan2_badge:'Recommended',
+    plan2_next_price:'Next price €249/mo',
+    plan2_desc:'Fully automated trading. Connect your MT4/MT5 account through MetaAPI — the system trades for you. Zero screen watching. Pause anytime via Telegram (see FAQ section)',
+    p2f0:'Fully automated execution', p2f1:'Telegram notifications', p2f2:'Automated trade execution', p2f3:'MetaAPI — secure MT4/MT5 connection', p2f4:'Flexible risk management', p2f5:'Personal consultation', p2f6:'Priority support',
+    plan2_btn:'Choose Automated →',
+    plan_monthly_tag:'Monthly', plan_monthly_per:'/mo', plan_monthly_btn:'Choose Monthly →',
+    plan3_tag:'Annual', plan3_badge:'',
+    plan3_save_new:'Save €2,189 ANNUALLY',
+    plan3_save:'Save €1,198/year', plan3_billed:'Billed €1,790/year',
+    plan3_desc:'Full Automated plan functionality — paid annually upfront. Save 40% compared to the monthly plan.',
+    p3f0:'Fully automated execution', p3f1:'Everything in Automated plan', p3f2:'Automated trade execution', p3f3:'MetaAPI — secure MT4/MT5 connection', p3f4:'Flexible risk management', p3f5:'Personal consultation', p3f6:'Priority support',
+    plan3_btn:'Choose Annual →',
+    per_month3:'/mo',
+    plans_note:'Secure payment · Cancel anytime · No hidden fees',
+    plans_telegram:'Questions? Telegram',
+    trust1_desc:'Your MT4/MT5 account is connected through a secure MetaAPI connection. Automated copying requires your main/trading password, not a read-only viewing password.',
+    trust2_title:'Transparent trade history', trust2_desc:'All results shown are synthetic demo data for portfolio demonstration purposes.',
+    trust3_title:'One pair — expertise', trust3_desc:'We trade only XAUUSD — gold. Deep knowledge of one market beats surface knowledge of all.',
+    deposit_eyebrow:'Recommended deposits', deposit_note:'Exact minimum depends on your broker leverage. We always recommend more — the larger the buffer, the more stable the results.',
+    help_eyebrow:'Need help?', help_text:'No MT4/MT5 account? Not sure where to start? I will guide you from A to Z — from opening an account to your first trade.', help_btn:'Message on Telegram →',
+    footer_privacy:'Privacy policy', footer_terms:'Terms', footer_telegram:'Telegram', footer_contact:'Contact',
+    footer_disc:'Risk warning: trading financial instruments involves a high level of risk. Past results do not guarantee future returns. Aurora XAU provides a technology (copy trading software) service and is not a licensed financial intermediary or investment consultant. This service is not financial advice. Only invest funds you can afford to lose.',
+  }
+};
+
+function updateDrawdownTooltipLang() {
+  const tooltip = document.getElementById('drawdown-tooltip');
+  if (!tooltip) return;
+  tooltip.textContent = currentLang === 'en'
+    ? tooltip.getAttribute('data-en')
+    : tooltip.getAttribute('data-lt');
+}
+
+function toggleDrawdownTooltip(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  const help = event.currentTarget;
+  if (!help) return;
+  help.classList.toggle('open');
+  updateDrawdownTooltipLang();
+}
+
+function handleDrawdownTooltipKey(event) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    toggleDrawdownTooltip(event);
+  } else if (event.key === 'Escape') {
+    event.currentTarget.classList.remove('open');
+  }
+}
+
+document.addEventListener('click', function(event) {
+  if (!(event.target instanceof Element) || !event.target.closest('.drawdown-help')) {
+    document.querySelectorAll('.drawdown-help.open').forEach(el => el.classList.remove('open'));
+  }
+});
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+  const t = i18n[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+  document.documentElement.lang = lang;
+  checkMarketHours();
+  updateOpenTrades(openTrades);
+  updateDrawdownTooltipLang();
+  renderFaq(lang);
+  renderTrades(lang);
+  renderMonthly(lang);
+  renderProfitGrid(lang);
+  updateHeroPnl();
+  updateMonthlyCardLabel(lang);
+}
+
+
+</script>
+<!-- SCROLL TO TOP -->
+<style>
+.scroll-top {
+  position: fixed; bottom: 32px; right: 32px; z-index: 200;
+  width: 44px; height: 44px;
+  background: rgba(14,13,10,0.9);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; opacity: 0; pointer-events: none;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+}
+.scroll-top.visible { opacity: 1; pointer-events: all; }
+.scroll-top:hover { border-color: var(--gold); color: var(--gold2); transform: translateY(-2px); }
+@media (max-width: 768px) { .scroll-top { bottom: 20px; right: 20px; width: 38px; height: 38px; } }
+</style>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Į viršų">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 12V4M4 8l4-4 4 4"/>
+  </svg>
+</button>
+
+<script>
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const btn = document.getElementById('hamburger');
+  const isOpen = menu.classList.toggle('open');
+  btn.textContent = isOpen ? '✕' : '☰';
+}
+function closeMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const btn = document.getElementById('hamburger');
+  if (menu) { menu.classList.remove('open'); }
+  if (btn) { btn.textContent = '☰'; }
+}
+document.addEventListener('click', function(e) {
+  const nav = document.querySelector('nav');
+  if (!nav.contains(e.target)) { closeMobileMenu(); }
+});
+
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 400);
+});
+</script>
+
+<!-- COOKIE BANNER -->
+<style>
+.cookie-banner {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+  background: #0e0d0a; border-top: 1px solid rgba(201,168,76,0.2);
+  padding: 20px 40px; display: flex; align-items: center;
+  justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  transform: translateY(100%); transition: transform 0.4s ease;
+}
+.cookie-banner.show { transform: translateY(0); }
+.cookie-text { font-size: 13px; font-weight: 300; color: #7a7060; line-height: 1.6; max-width: 700px; }
+.cookie-text a { color: #c9a84c; text-decoration: none; }
+.cookie-text a:hover { color: #e8c96a; }
+.cookie-btns { display: flex; gap: 10px; flex-shrink: 0; }
+.cookie-accept {
+  background: linear-gradient(135deg, #c9a84c, #e8c96a);
+  color: #0a0906; border: none; padding: 10px 24px;
+  font-family: 'Outfit', sans-serif; font-size: 12px;
+  font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: opacity 0.2s;
+}
+.cookie-accept:hover { opacity: 0.85; }
+.cookie-decline {
+  background: none; border: 1px solid rgba(201,168,76,0.3);
+  color: #7a7060; padding: 10px 20px;
+  font-family: 'Outfit', sans-serif; font-size: 12px;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+}
+.cookie-decline:hover { border-color: rgba(201,168,76,0.6); color: #c9a84c; }
+@media (max-width: 768px) {
+  .cookie-banner { padding: 16px 20px; flex-direction: column; }
+  .cookie-btns { width: 100%; }
+  .cookie-accept, .cookie-decline { flex: 1; text-align: center; }
+}
+</style>
+
+<div class="cookie-banner" id="cookieBanner">
+  <div class="cookie-text">
+    Naudojame slapukus (cookies) svetainės analizei ir veikimui gerinti. Skaitykite mūsų <a href="legal.html">privatumo politiką</a>.
+  </div>
+  <div class="cookie-btns">
+    <button class="cookie-decline" onclick="declineCookies()">Atmesti</button>
+    <button class="cookie-accept" onclick="acceptCookies()">Sutinku</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const consent = localStorage.getItem('cookie_consent');
+  if (!consent) {
+    setTimeout(() => {
+      document.getElementById('cookieBanner').classList.add('show');
+    }, 1500);
+  }
+})();
+
+function acceptCookies() {
+  localStorage.setItem('cookie_consent', 'accepted');
+  document.getElementById('cookieBanner').classList.remove('show');
+}
+
+function declineCookies() {
+  localStorage.setItem('cookie_consent', 'declined');
+  document.getElementById('cookieBanner').classList.remove('show');
+}
+</script>
+
+</body>
+</html>

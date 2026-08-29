@@ -1,0 +1,14 @@
+anthropic>=0.51.0
+pandas>=2.1.0
+numpy>=1.26.0
+APScheduler>=3.10.4
+pytz>=2024.1
+tenacity>=8.2.3
+python-dotenv>=1.0.1
+requests>=2.31.0
+telethon>=1.36.0
+flask>=3.0.0
+mplfinance>=0.12.9b5
+matplotlib>=3.8.0
+pydantic>=2.0.0
+yfinance>=0.2.40
