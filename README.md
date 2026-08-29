@@ -1,4 +1,4 @@
-# Aurora Trading Platform
+# Automated Trading Platform
 
 Automated XAU/USD (gold) trading system with subscription-based signal copying to MT4/MT5 accounts.
 

@@ -1,0 +1,46 @@
+import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
+
+// ── DEMO MODE ──────────────────────────────────────────────────────────────
+// Default: true — this public portfolio version always runs in demo mode.
+// In demo mode all MetaAPI/CopyFactory/broker calls are blocked at runtime.
+export const DEMO_MODE = process.env.DEMO_MODE !== 'false';
+
+// ── Clients ────────────────────────────────────────────────────────────────
+// Fallback placeholder values allow the server to boot in demo mode without
+// real credentials — all live calls are blocked by demoGuard anyway.
+export const supabase = createClient(
+  process.env.SUPABASE_URL || 'https://demo-placeholder.supabase.co',
+  process.env.SUPABASE_SERVICE_KEY || 'demo-service-key-placeholder'
+);
+
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_demo_placeholder');
+
+// ── Constants ──────────────────────────────────────────────────────────────
+export const ALLOWED_LOT_SIZES = [
+  0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10,
+  0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00,
+];
+
+export const TP_CHECK_INTERVAL_MS = Math.max(
+  5_000,
+  Number(process.env.TP_CHECK_INTERVAL_MS || process.env.BE_CHECK_INTERVAL_MS || 15_000) || 15_000
+);
+
+export const STATS_RESET_AT = process.env.STATS_RESET_AT ?? '2026-06-27T00:00:00.000+00:00';
+
+// src_code values whose agents manage their own TP notifications
+export const SINGLE_STEP_TP_SRC_CODES = new Set([6, 7, 9, 10, 11]);
+
+export const MAX_GENERATED_TP_LEVELS = Math.max(
+  1,
+  Number(process.env.MAX_GENERATED_TP_LEVELS || 12) || 12
+);
+
+export const AGENT_STATE_FILE = new URL('../agent_state.json', import.meta.url).pathname;
+export const EMA_CACHE_FILE = '/tmp/tv_ema_cache.json';
+
+export const METAAPI_PROVISIONING_BASE = 'https://mt-provisioning-api-v1.agiliumtrade.agiliumtrade.ai';
+export const METAAPI_REGIONS = ['london', 'new-york'];
+export const COPYFACTORY_STRATEGY_ID = process.env.COPYFACTORY_STRATEGY_ID || 'YOUR_STRATEGY_ID';
+export const HHHL_DEDUP_MS = 15_000;

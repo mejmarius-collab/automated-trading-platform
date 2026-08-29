@@ -1,8 +1,8 @@
-# Aurora Trading Platform — Architecture
+# Automated Trading Platform — Architecture
 
 ## System Overview
 
-Aurora is an automated gold (XAU/USD) trading platform with:
+This is an automated gold (XAU/USD) trading platform with:
 - **Frontend**: Static HTML/CSS/JS site (subscription landing + onboarding flow)
 - **Backend**: Node.js/Express API (Stripe webhooks, MetaAPI, CopyFactory, Supabase)
 - **Python Automation**: Multi-agent trading system (EMA strategy, HHHL structure, trendline breaks)
