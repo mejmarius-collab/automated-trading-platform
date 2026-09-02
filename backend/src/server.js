@@ -48,7 +48,9 @@ app.use((req, res, next) => {
 });
 
 // ── Stripe webhook — MUST be before express.json() ───────────────────────────
-app.post('/webhook/stripe', express.raw({ type: 'application/json' }), stripeWebhookHandler);
+// demoGuard is a pass-through when DEMO_MODE=false; in demo mode it stops the
+// handler before it tries to verify a signature against placeholder keys.
+app.post('/webhook/stripe', express.raw({ type: 'application/json' }), demoGuard, stripeWebhookHandler);
 
 // ── Static frontend ───────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '../../frontend')));
@@ -72,6 +74,31 @@ if (DEMO_MODE) {
   // Mounted at /api/demo — this is the path the frontend, README and
   // docs/architecture.md all reference.
   app.use('/api/demo', demoRouter);
+}
+
+// ── Live-route blocker ───────────────────────────────────────────────────────
+// Everything below this line needs real credentials. The write-blocker above
+// only covers mutating methods, so in demo mode GETs fell straight through to
+// the live handlers and called Supabase / MetaAPI / TwelveData with the
+// placeholder config from config.js. Measured before this guard existed:
+//
+//   GET /stats        hung ~12s on DNS for demo-placeholder.supabase.co
+//   GET /pnl/monthly  500 after 7s
+//   GET /trades/open  200 after 7.4s
+//   GET /price        502 (TwelveData rejects the placeholder key)
+//
+// Both surfaces the demo actually uses — the static frontend and /api/demo/* —
+// are mounted above, so this blocks nothing the demo needs. It is a catch-all
+// rather than a per-router guard so that routes added later are covered by
+// default; the trade-off is that an unknown path returns 503 instead of 404
+// while in demo mode.
+if (DEMO_MODE) {
+  app.use((req, res) => res.status(503).json({
+    ok: false,
+    demo: true,
+    error: 'Demo mode — this endpoint requires live credentials.',
+    hint: 'Mock data is served from /api/demo/*',
+  }));
 }
 
 app.use(webhooksRouter);
