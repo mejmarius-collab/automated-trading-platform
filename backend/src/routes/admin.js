@@ -1,5 +1,5 @@
 import express from 'express';
-import fetch from 'node-fetch';
+import { fetchWithTimeout } from '../utils/http.js';
 import { supabase, METAAPI_PROVISIONING_BASE } from '../config.js';
 import { state, saveAgentState } from '../state.js';
 import { demoGuard } from '../middleware/auth.js';
@@ -43,8 +43,8 @@ router.get('/admin/client-status', async (req, res) => {
   if (error || !client) return res.status(404).json({ error: 'Client not found in Supabase' });
   const accountId = client.metaapi_account_id;
   const result = { supabase: client, metaapi: null, copyfactory: null, tradeAllowed: null };
-  try { const r = await fetch(`${METAAPI_PROVISIONING_BASE}/users/current/accounts/${accountId}`, { headers: { 'auth-token': process.env.METAAPI_TOKEN } }); result.metaapi = await r.json(); } catch (e) { result.metaapi = { error: e.message }; }
-  try { const r = await fetch(`https://copyfactory-api-v1.london.agiliumtrade.ai/users/current/configuration/subscribers/${accountId}`, { headers: { 'auth-token': process.env.METAAPI_TOKEN } }); result.copyfactory = await r.json(); } catch (e) { result.copyfactory = { error: e.message }; }
+  try { const r = await fetchWithTimeout(`${METAAPI_PROVISIONING_BASE}/users/current/accounts/${accountId}`, { headers: { 'auth-token': process.env.METAAPI_TOKEN } }); result.metaapi = await r.json(); } catch (e) { result.metaapi = { error: e.message }; }
+  try { const r = await fetchWithTimeout(`https://copyfactory-api-v1.london.agiliumtrade.ai/users/current/configuration/subscribers/${accountId}`, { headers: { 'auth-token': process.env.METAAPI_TOKEN } }); result.copyfactory = await r.json(); } catch (e) { result.copyfactory = { error: e.message }; }
   try { const r = await metaApiFetch(`/users/current/accounts/${accountId}/account-information`, { headers: { 'auth-token': process.env.METAAPI_TOKEN } }); const ai = await r.json(); result.tradeAllowed = ai?.tradeAllowed ?? null; result.accountInfo = ai; } catch (e) { result.tradeAllowed = { error: e.message }; }
   res.json(result);
 });
@@ -60,10 +60,10 @@ router.get('/admin/subscriber-logs', async (req, res) => {
   const accountId = client.metaapi_account_id;
   const authHeader = { 'auth-token': process.env.METAAPI_TOKEN };
   const result = {};
-  try { const r = await fetch(`https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/${accountId}/positions`, { headers: authHeader }); result.positions = await r.json(); } catch (e) { result.positions = { error: e.message }; }
+  try { const r = await fetchWithTimeout(`https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/${accountId}/positions`, { headers: authHeader }); result.positions = await r.json(); } catch (e) { result.positions = { error: e.message }; }
   try {
     const start = new Date(Date.now() - 4 * 3600 * 1000).toISOString(), end = new Date().toISOString();
-    const r = await fetch(`https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/${accountId}/history-deals/time-range?startTime=${start}&endTime=${end}&limit=20`, { headers: authHeader });
+    const r = await fetchWithTimeout(`https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/${accountId}/history-deals/time-range?startTime=${start}&endTime=${end}&limit=20`, { headers: authHeader });
     result.recentDeals = await r.json();
   } catch (e) { result.recentDeals = { error: e.message }; }
   res.json(result);
@@ -81,7 +81,7 @@ router.get('/admin/copyfactory-log', async (req, res) => {
   const authHeader = { 'auth-token': process.env.METAAPI_TOKEN };
   const result = { symbols: null, cfLog: null };
   try { const r = await metaApiFetch(`/users/current/accounts/${accountId}/symbols`, { headers: authHeader }); const symbols = await r.json(); result.symbols = Array.isArray(symbols) ? symbols.filter(s => /^(XAU|GOLD)/i.test(s)) : symbols; } catch (e) { result.symbols = { error: e.message }; }
-  try { const r = await fetch(`https://copyfactory-api-v1.london.agiliumtrade.ai/users/current/subscribers/${accountId}/user-log?limit=50`, { headers: authHeader }); result.cfLog = await r.json(); } catch (e) { result.cfLog = { error: e.message }; }
+  try { const r = await fetchWithTimeout(`https://copyfactory-api-v1.london.agiliumtrade.ai/users/current/subscribers/${accountId}/user-log?limit=50`, { headers: authHeader }); result.cfLog = await r.json(); } catch (e) { result.cfLog = { error: e.message }; }
   res.json(result);
 });
 

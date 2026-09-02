@@ -1,10 +1,10 @@
-import fetch from 'node-fetch';
+import { fetchWithTimeout } from '../utils/http.js';
 import { METAAPI_PROVISIONING_BASE, COPYFACTORY_STRATEGY_ID } from '../config.js';
 import { delay } from '../utils/formatters.js';
 import { metaApiFetch } from './metaapi.js';
 
 async function metaApiProvisioningFetch(path, options = {}) {
-  return fetch(`${METAAPI_PROVISIONING_BASE}${path}`, {
+  return fetchWithTimeout(`${METAAPI_PROVISIONING_BASE}${path}`, {
     ...options,
     headers: { 'Content-Type': 'application/json', 'auth-token': process.env.METAAPI_TOKEN, ...(options.headers || {}) },
   });
@@ -34,7 +34,7 @@ export async function callMetaApiAccountAction(accountId, action) {
 export async function deleteCopyFactorySubscriber(subscriberId) {
   if (!subscriberId) return { ok: true, status: 0, body: '' };
   try {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `https://copyfactory-api-v1.london.agiliumtrade.ai/users/current/configuration/subscribers/${subscriberId}`,
       { method: 'DELETE', headers: { 'auth-token': process.env.METAAPI_TOKEN } }
     );
@@ -89,7 +89,7 @@ export function buildCopyFactorySubscriberConfig(email, lotSize, brokerSymbol = 
 }
 
 export async function putCopyFactorySubscriber(subscriberId, email, lotSize, brokerSymbol = null) {
-  const res = await fetch(
+  const res = await fetchWithTimeout(
     `https://copyfactory-api-v1.london.agiliumtrade.ai/users/current/configuration/subscribers/${subscriberId}`,
     {
       method: 'PUT',

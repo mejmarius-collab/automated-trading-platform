@@ -1,10 +1,22 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { fetchWithTimeout, HTTP_TIMEOUT_MS } from './utils/http.js';
 
 // ── DEMO MODE ──────────────────────────────────────────────────────────────
 // Default: true — this public portfolio version always runs in demo mode.
 // In demo mode all MetaAPI/CopyFactory/broker calls are blocked at runtime.
 export const DEMO_MODE = process.env.DEMO_MODE !== 'false';
+
+// ── Request deadline ───────────────────────────────────────────────────────
+// Ceiling on how long a single HTTP request may stay open. A per-call timeout
+// alone does not bound a handler: supabase-js retries a failed query four times
+// with backoff, so one .select() against a dead host costs roughly 8x the
+// per-fetch timeout, and GET /stats issues four of them in sequence. This is
+// the backstop that guarantees the client always gets an answer.
+export const REQUEST_TIMEOUT_MS = Math.max(
+  1_000,
+  Number(process.env.REQUEST_TIMEOUT_MS || 30_000) || 30_000
+);
 
 // ── Proxy trust ────────────────────────────────────────────────────────────
 // req.ip has exactly one consumer: the per-IP rate limiter in middleware/auth.js.
@@ -66,12 +78,19 @@ export function isOriginAllowed(origin) {
 // ── Clients ────────────────────────────────────────────────────────────────
 // Fallback placeholder values allow the server to boot in demo mode without
 // real credentials — all live calls are blocked by demoGuard anyway.
+// Both SDKs ship their own HTTP layer, so routing the raw fetch() call sites
+// through fetchWithTimeout does not cover them — they need to be bounded here.
+// Supabase honours an injected fetch; Stripe takes a timeout directly.
 export const supabase = createClient(
   process.env.SUPABASE_URL || 'https://demo-placeholder.supabase.co',
-  process.env.SUPABASE_SERVICE_KEY || 'demo-service-key-placeholder'
+  process.env.SUPABASE_SERVICE_KEY || 'demo-service-key-placeholder',
+  { global: { fetch: fetchWithTimeout } }
 );
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_demo_placeholder');
+export const stripe = new Stripe(
+  process.env.STRIPE_SECRET_KEY || 'sk_test_demo_placeholder',
+  { timeout: HTTP_TIMEOUT_MS }
+);
 
 // ── Constants ──────────────────────────────────────────────────────────────
 export const ALLOWED_LOT_SIZES = [

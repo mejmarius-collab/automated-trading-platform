@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import { fetchWithTimeout } from '../utils/http.js';
 import { METAAPI_REGIONS } from '../config.js';
 import { isMetaApiTradeSuccess } from '../utils/formatters.js';
 
@@ -7,7 +7,7 @@ export async function metaApiFetch(path, options = {}) {
   for (const region of METAAPI_REGIONS) {
     const url = `https://mt-client-api-v1.${region}.agiliumtrade.ai${path}`;
     try {
-      const res = await fetch(url, options);
+      const res = await fetchWithTimeout(url, options);
       const contentType = res.headers.get('content-type') || '';
       if (!contentType.includes('application/json') && !res.ok) {
         console.warn(`MetaAPI ${region} returned non-JSON (${res.status}), trying next region`);

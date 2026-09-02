@@ -1,9 +1,9 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import fetch from 'node-fetch';
+import { fetchWithTimeout, HTTP_TIMEOUT_MS } from './utils/http.js';
 
-import { DEMO_MODE, supabase, CORS_ALLOWED_ORIGINS, isOriginAllowed, TRUST_PROXY } from './config.js';
+import { DEMO_MODE, supabase, CORS_ALLOWED_ORIGINS, isOriginAllowed, TRUST_PROXY, REQUEST_TIMEOUT_MS } from './config.js';
 import { state, saveAgentState, emaControlReady, trendlineReady, loadTlActiveOrders } from './state.js';
 import { sendTelegram } from './services/telegram.js';
 import { startMonitors } from './services/monitors.js';
@@ -23,6 +23,27 @@ const PORT = process.env.PORT || 3000;
 
 // Must be set before any middleware reads req.ip — see TRUST_PROXY in config.js.
 app.set('trust proxy', TRUST_PROXY);
+
+// ── Request deadline ─────────────────────────────────────────────────────────
+// Guarantees every request gets an answer. utils/http.js bounds each individual
+// outbound call, but that does not bound a handler: supabase-js retries a
+// failed query four times with backoff, so GET /stats — four sequential queries
+// — could still hold a connection open for a minute against a dead database.
+//
+// The handler's own work is not cancelled, so a slow handler may still try to
+// respond after this fires; that logs ERR_HTTP_HEADERS_SENT and is harmless,
+// since the client already has its response.
+app.use((req, res, next) => {
+  const timer = setTimeout(() => {
+    if (res.headersSent) return;
+    console.warn(`Request deadline exceeded (${REQUEST_TIMEOUT_MS}ms): ${req.method} ${req.originalUrl}`);
+    res.status(504).json({ error: 'Upstream timeout' });
+  }, REQUEST_TIMEOUT_MS);
+
+  res.on('finish', () => clearTimeout(timer));
+  res.on('close', () => clearTimeout(timer));
+  next();
+});
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
 // Only origins in CORS_ALLOWED_ORIGINS receive an Access-Control-Allow-Origin
@@ -128,7 +149,7 @@ app.get('/price/internal', async (req, res) => {
   try {
     const now = Date.now();
     if (state.priceCache && now - state.priceCacheTime < 10_000) return res.json(state.priceCache);
-    const response = await fetch(`https://api.twelvedata.com/quote?symbol=XAU/USD&apikey=${process.env.TWELVE_DATA_API_KEY}`);
+    const response = await fetchWithTimeout(`https://api.twelvedata.com/quote?symbol=XAU/USD&apikey=${process.env.TWELVE_DATA_API_KEY}`);
     const d = await response.json();
     const price = d.close ?? d.price ?? null;
     if (!response.ok || price == null) { if (state.priceCache) return res.json(state.priceCache); return res.status(502).json({ error: 'Price unavailable' }); }
@@ -199,7 +220,7 @@ if (!DEMO_MODE) {
 app.listen(PORT, async () => {
   console.log(`Automated Trading Platform running on port ${PORT} [DEMO_MODE=${DEMO_MODE}]`);
 
-  console.log(`trust proxy: ${JSON.stringify(TRUST_PROXY)}`);
+  console.log(`trust proxy: ${JSON.stringify(TRUST_PROXY)} | http timeout: ${HTTP_TIMEOUT_MS}ms | request deadline: ${REQUEST_TIMEOUT_MS}ms`);
 
   if (CORS_ALLOWED_ORIGINS.length > 0) {
     console.log(`CORS allowlist: ${CORS_ALLOWED_ORIGINS.join(', ')}`);
@@ -228,7 +249,7 @@ app.listen(PORT, async () => {
     const webhookUrl = `${process.env.RAILWAY_SERVER_URL || 'https://yourdomain.com'}/telegram-webhook`;
     const webhookBody = { url: webhookUrl };
     if (process.env.TELEGRAM_WEBHOOK_SECRET) webhookBody.secret_token = process.env.TELEGRAM_WEBHOOK_SECRET;
-    const r = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/setWebhook`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(webhookBody) });
+    const r = await fetchWithTimeout(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/setWebhook`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(webhookBody) });
     const d = await r.json();
     console.log('Telegram setWebhook:', JSON.stringify(d), 'secured:', !!process.env.TELEGRAM_WEBHOOK_SECRET);
   } catch (err) { console.error('Telegram setWebhook error:', err); }

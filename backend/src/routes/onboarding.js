@@ -11,7 +11,7 @@ import {
 import { createOnboardingToken, verifyOnboardingToken } from '../security/tokens.js';
 import { normalizeLotSize, formatLotSize, cleanEmail, requireEmail, cleanContactHandle, formatContactLine } from '../utils/validators.js';
 import { METAAPI_PROVISIONING_BASE } from '../config.js';
-import fetch from 'node-fetch';
+import { fetchWithTimeout } from '../utils/http.js';
 
 const router = express.Router();
 
@@ -121,7 +121,7 @@ router.post('/connect-account', demoGuard, express.json(), async (req, res) => {
       platform: String(platform).toLowerCase() === 'mt5' ? 'mt5' : 'mt4',
       magic: 0,
     };
-    const createRes = await fetch(`${METAAPI_PROVISIONING_BASE}/users/current/accounts`, {
+    const createRes = await fetchWithTimeout(`${METAAPI_PROVISIONING_BASE}/users/current/accounts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'auth-token': process.env.METAAPI_TOKEN },
       body: JSON.stringify(accountPayload),

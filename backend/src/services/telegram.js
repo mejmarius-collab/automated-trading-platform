@@ -1,9 +1,9 @@
-import fetch from 'node-fetch';
+import { fetchWithTimeout } from '../utils/http.js';
 
 // Never throws — a Telegram error must not crash calling routes (e.g. Stripe webhook → 500 → retries → duplicates)
 export async function sendTelegram(chatId, text, options = {}) {
   try {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
       {
         method: 'POST',

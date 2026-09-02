@@ -1,5 +1,5 @@
 import express from 'express';
-import fetch from 'node-fetch';
+import { fetchWithTimeout } from '../utils/http.js';
 import { supabase } from '../config.js';
 import { state } from '../state.js';
 import { publicLimiter } from '../middleware/auth.js';
@@ -14,7 +14,7 @@ router.get('/price', publicLimiter, async (req, res) => {
     const now = Date.now();
     if (state.priceCache && now - state.priceCacheTime < 10_000) return res.json(state.priceCache);
 
-    const response = await fetch(`https://api.twelvedata.com/quote?symbol=XAU/USD&apikey=${process.env.TWELVE_DATA_API_KEY}`);
+    const response = await fetchWithTimeout(`https://api.twelvedata.com/quote?symbol=XAU/USD&apikey=${process.env.TWELVE_DATA_API_KEY}`);
     const d = await response.json();
     const price = d.close ?? d.price ?? null;
 
