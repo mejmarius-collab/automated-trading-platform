@@ -43,7 +43,7 @@ app.use(express.json());
 if (DEMO_MODE) {
   app.use((req, res, next) => {
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-      if (req.path.startsWith('/demo/')) return next();
+      if (req.path.startsWith('/api/demo/')) return next();
       return res.json({ ok: true, demo: true, message: 'Demo mode — no live operations executed' });
     }
     next();
@@ -52,7 +52,9 @@ if (DEMO_MODE) {
 
 // ── Route mounting ────────────────────────────────────────────────────────────
 if (DEMO_MODE) {
-  app.use('/demo', demoRouter);
+  // Mounted at /api/demo — this is the path the frontend, README and
+  // docs/architecture.md all reference.
+  app.use('/api/demo', demoRouter);
 }
 
 app.use(webhooksRouter);
