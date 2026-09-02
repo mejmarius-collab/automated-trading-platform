@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import fetch from 'node-fetch';
 
-import { DEMO_MODE, supabase, CORS_ALLOWED_ORIGINS, isOriginAllowed } from './config.js';
+import { DEMO_MODE, supabase, CORS_ALLOWED_ORIGINS, isOriginAllowed, TRUST_PROXY } from './config.js';
 import { state, saveAgentState, emaControlReady, trendlineReady, loadTlActiveOrders } from './state.js';
 import { sendTelegram } from './services/telegram.js';
 import { startMonitors } from './services/monitors.js';
@@ -20,6 +20,9 @@ import adminRouter from './routes/admin.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Must be set before any middleware reads req.ip — see TRUST_PROXY in config.js.
+app.set('trust proxy', TRUST_PROXY);
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
 // Only origins in CORS_ALLOWED_ORIGINS receive an Access-Control-Allow-Origin
@@ -142,6 +145,8 @@ setInterval(() => {
 // ── Startup ───────────────────────────────────────────────────────────────────
 app.listen(PORT, async () => {
   console.log(`Automated Trading Platform running on port ${PORT} [DEMO_MODE=${DEMO_MODE}]`);
+
+  console.log(`trust proxy: ${JSON.stringify(TRUST_PROXY)}`);
 
   if (CORS_ALLOWED_ORIGINS.length > 0) {
     console.log(`CORS allowlist: ${CORS_ALLOWED_ORIGINS.join(', ')}`);

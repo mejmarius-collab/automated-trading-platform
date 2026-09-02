@@ -6,7 +6,9 @@ export function demoGuard(req, res, next) {
 }
 
 // Simple fixed-window per-IP rate limiter (no external dependencies).
-// Railway runs behind a proxy — app.set('trust proxy', 1) is required for req.ip to be correct.
+// req.ip is only meaningful if the app's 'trust proxy' setting matches its
+// deployment. server.js sets it from TRUST_PROXY (see config.js); behind
+// Railway's single proxy hop that resolves req.ip to the real client.
 const rateMap = new Map();
 
 export function rateLimit(limit = 60, windowMs = 60_000) {

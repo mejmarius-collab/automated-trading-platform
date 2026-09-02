@@ -6,6 +6,32 @@ import { createClient } from '@supabase/supabase-js';
 // In demo mode all MetaAPI/CopyFactory/broker calls are blocked at runtime.
 export const DEMO_MODE = process.env.DEMO_MODE !== 'false';
 
+// ── Proxy trust ────────────────────────────────────────────────────────────
+// req.ip has exactly one consumer: the per-IP rate limiter in middleware/auth.js.
+// Getting this setting wrong breaks that limiter in one of two directions:
+//
+//   too low  — behind Railway's proxy req.ip is the proxy, so every visitor
+//              shares a single bucket and the limiter becomes a global cap.
+//   too high — with no real proxy in front, X-Forwarded-For is attacker
+//              controlled, so the limiter can be bypassed at will.
+//
+// Hence: explicit, and overridable. TRUST_PROXY accepts a hop count (1),
+// true/false, or anything Express understands ('loopback', a CIDR, a list).
+//
+// Default follows how this app is actually deployed: DEMO_MODE=true is the
+// local/portfolio case with no proxy, DEMO_MODE=false is the Railway
+// deployment, which always fronts the app with exactly one proxy hop.
+function parseTrustProxy(raw, demoMode) {
+  if (raw === undefined || String(raw).trim() === '') return demoMode ? false : 1;
+  const value = String(raw).trim();
+  if (value === '0' || value.toLowerCase() === 'false') return false;
+  if (value.toLowerCase() === 'true') return true;
+  if (/^\d+$/.test(value)) return Number(value);
+  return value;
+}
+
+export const TRUST_PROXY = parseTrustProxy(process.env.TRUST_PROXY, DEMO_MODE);
+
 // ── CORS ───────────────────────────────────────────────────────────────────
 // Comma-separated allowlist of browser origins permitted to read responses:
 //   CORS_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
