@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import fetch from 'node-fetch';
 
-import { DEMO_MODE, supabase } from './config.js';
+import { DEMO_MODE, supabase, CORS_ALLOWED_ORIGINS, isOriginAllowed } from './config.js';
 import { state, saveAgentState, emaControlReady, trendlineReady, loadTlActiveOrders } from './state.js';
 import { sendTelegram } from './services/telegram.js';
 import { startMonitors } from './services/monitors.js';
@@ -22,10 +22,24 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
+// Only origins in CORS_ALLOWED_ORIGINS receive an Access-Control-Allow-Origin
+// header. A disallowed origin still gets a response, but without that header
+// the browser refuses to expose it to the page — which is the intended block.
+//
+// Requests carrying no Origin header (server-to-server, curl, same-origin
+// navigation) pass through untouched: CORS never applied to them in the first
+// place, and they are authenticated by x-webhook-secret where it matters.
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-webhook-secret, x-telegram-bot-api-secret-token');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  const origin = req.headers.origin;
+  res.vary('Origin');
+
+  if (isOriginAllowed(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-webhook-secret, x-telegram-bot-api-secret-token');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Max-Age', '600');
+  }
+
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
@@ -128,6 +142,15 @@ setInterval(() => {
 // ── Startup ───────────────────────────────────────────────────────────────────
 app.listen(PORT, async () => {
   console.log(`Automated Trading Platform running on port ${PORT} [DEMO_MODE=${DEMO_MODE}]`);
+
+  if (CORS_ALLOWED_ORIGINS.length > 0) {
+    console.log(`CORS allowlist: ${CORS_ALLOWED_ORIGINS.join(', ')}`);
+  } else if (DEMO_MODE) {
+    console.log('CORS allowlist: unset — allowing localhost origins (demo mode only).');
+  } else {
+    console.warn('CORS_ALLOWED_ORIGINS is not set: all cross-origin browser requests will be refused. Set it to your frontend origin(s).');
+  }
+
   if (DEMO_MODE) {
     console.log('[DEMO] Startup: skipping Supabase, Telegram setWebhook and all external service calls.');
     return;

@@ -6,6 +6,37 @@ import { createClient } from '@supabase/supabase-js';
 // In demo mode all MetaAPI/CopyFactory/broker calls are blocked at runtime.
 export const DEMO_MODE = process.env.DEMO_MODE !== 'false';
 
+// ── CORS ───────────────────────────────────────────────────────────────────
+// Comma-separated allowlist of browser origins permitted to read responses:
+//   CORS_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+//
+// CORS is a browser-only mechanism. Server-to-server callers (the Python
+// agents, Stripe webhooks) send no Origin header, are never subject to it, and
+// authenticate with x-webhook-secret instead — so tightening this does not
+// affect them.
+export const CORS_ALLOWED_ORIGINS = (process.env.CORS_ALLOWED_ORIGINS || '')
+  .split(',')
+  .map(o => o.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
+
+const LOCALHOST_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+
+/**
+ * An origin is allowed when it is listed in CORS_ALLOWED_ORIGINS.
+ *
+ * With no allowlist configured we fall back to localhost only, and only in
+ * DEMO_MODE, so `npm install && node server.js` works with no .env file. In
+ * production (DEMO_MODE=false) an unset allowlist means no cross-origin access
+ * at all — failing closed rather than silently allowing everything.
+ */
+export function isOriginAllowed(origin) {
+  if (!origin) return false;
+  const normalized = String(origin).replace(/\/+$/, '');
+  if (CORS_ALLOWED_ORIGINS.includes(normalized)) return true;
+  if (CORS_ALLOWED_ORIGINS.length === 0 && DEMO_MODE) return LOCALHOST_ORIGIN.test(normalized);
+  return false;
+}
+
 // ── Clients ────────────────────────────────────────────────────────────────
 // Fallback placeholder values allow the server to boot in demo mode without
 // real credentials — all live calls are blocked by demoGuard anyway.
