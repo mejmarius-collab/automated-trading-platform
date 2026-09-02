@@ -155,19 +155,45 @@ app.get('/stats', async (req, res) => {
   } catch (err) { console.error('GET /stats error:', err); res.status(500).json({ error: 'Internal server error' }); }
 });
 
-// ── Midnight auto-reset: re-enable EMA agent at 00:00 Vilnius ────────────────
-setInterval(() => {
-  const now = new Date();
-  const vln = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Vilnius' }));
-  if (vln.getHours() === 0 && vln.getMinutes() === 0) {
-    if (state.emaAgentPaused) {
-      state.emaAgentPaused = false;
-      saveAgentState();
-      console.log('Midnight auto-reset: EMA agent re-enabled');
-      sendTelegram(process.env.TELEGRAM_ADMIN_CHAT_ID, '🔄 Midnight auto-reset: EMA agentas automatiškai įjungtas (00:00 Vilnius)');
-    }
-  }
-}, 60_000);
+// ── Midnight auto-reset: re-enable the EMA agent when the Vilnius day rolls over
+//
+// Not scheduled in demo mode. The body calls saveAgentState(), which upserts
+// into Supabase, and sendTelegram() — neither should run against the
+// placeholder credentials config.js falls back to.
+//
+// Keyed on the Vilnius calendar date rather than on catching the 00:00 minute.
+// The previous check (hours === 0 && minutes === 0) only did anything if a
+// timer tick happened to land inside one specific 60-second window each day, so
+// a blocked event loop or a restart spanning that minute skipped the reset
+// silently until the next day. Comparing dates removes the window entirely:
+// whichever tick first observes a new date does the work, and the recorded date
+// makes a second run that day a no-op.
+if (!DEMO_MODE) {
+  // formatToParts rather than `new Date(d.toLocaleString(...))`: that idiom
+  // round-trips through a non-standard date string whose parsing is
+  // implementation-defined.
+  const vilniusDate = () => {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Vilnius', year: 'numeric', month: '2-digit', day: '2-digit',
+    }).formatToParts(new Date());
+    const get = (type) => parts.find((p) => p.type === type)?.value;
+    return `${get('year')}-${get('month')}-${get('day')}`;
+  };
+
+  let lastSeenDate = vilniusDate();
+
+  setInterval(() => {
+    const today = vilniusDate();
+    if (today === lastSeenDate) return;
+    lastSeenDate = today;
+
+    if (!state.emaAgentPaused) return;
+    state.emaAgentPaused = false;
+    saveAgentState();
+    console.log(`Midnight auto-reset: EMA agent re-enabled (${today} Vilnius)`);
+    sendTelegram(process.env.TELEGRAM_ADMIN_CHAT_ID, '🔄 Midnight auto-reset: EMA agentas automatiškai įjungtas (00:00 Vilnius)');
+  }, 60_000);
+}
 
 // ── Startup ───────────────────────────────────────────────────────────────────
 app.listen(PORT, async () => {
