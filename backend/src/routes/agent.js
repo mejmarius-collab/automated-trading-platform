@@ -5,20 +5,21 @@ import { state, saveAgentState, emaControlReady } from '../state.js';
 import { metaApiFetch } from '../services/metaapi.js';
 import { cancelOrderByMagic } from '../services/metaapi.js';
 import { nowVilnius } from '../utils/formatters.js';
+import { safeEqual } from '../security/safeEqual.js';
 
 const router = express.Router();
 
 // ── GET /agent/master-lot ───────────────────────────────────────────────────
 router.get('/agent/master-lot', (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   res.json({ lot: state.masterLotSize });
 });
 
 // ── POST /cycle/state — pushed by Python cycle agent ───────────────────────
 router.post('/cycle/state', express.json(), (req, res) => {
   const secret = req.body?.secret || req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'unauthorized' });
   state.cycleState = req.body?.state || null;
   res.json({ ok: true });
 });
@@ -26,7 +27,7 @@ router.post('/cycle/state', express.json(), (req, res) => {
 // ── POST /api/msb-close-magic — close any open position by magic ───────────
 router.post('/api/msb-close-magic', express.json(), async (req, res) => {
   const secret = req.body?.secret || req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const magic = Number(req.body?.magic);
   if (!magic) return res.status(400).json({ error: 'magic required' });
   try {
@@ -40,7 +41,7 @@ router.post('/api/msb-close-magic', express.json(), async (req, res) => {
 // ── GET /api/account-balance ────────────────────────────────────────────────
 router.get('/api/account-balance', async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const infoRes = await metaApiFetch(`/users/current/accounts/${process.env.METAAPI_MASTER_ACCOUNT_ID}/account-information`, { headers: { 'auth-token': process.env.METAAPI_TOKEN } });
     const info = await infoRes.json();
@@ -52,7 +53,7 @@ router.get('/api/account-balance', async (req, res) => {
 // ── POST /api/modify-sl ─────────────────────────────────────────────────────
 router.post('/api/modify-sl', express.json(), async (req, res) => {
   const secret = req.body?.secret || req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const magic = Number(req.body?.magic), sl = Number(req.body?.sl);
   if (!magic || sl == null || isNaN(sl)) return res.status(400).json({ error: 'magic and sl required' });
   try {
@@ -71,7 +72,7 @@ router.post('/api/modify-sl', express.json(), async (req, res) => {
 // ── EMA cache ───────────────────────────────────────────────────────────────
 router.post('/ema-update', express.json(), (req, res) => {
   const secret = req.query.secret || req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const { ema20_1h, ema50_1h, ema200_1h, ema20_4h, ema50_4h, ema200_4h, ema20_d, ema50_d, ema20_15m, ema50_15m, o15m, h15m, l15m, c15m, t } = req.body;
   if (!ema20_1h || !ema200_1h) return res.status(400).json({ error: 'Missing required EMA fields' });
   state.tvEmaCache = { ema20_1h, ema50_1h, ema200_1h, ema20_4h, ema50_4h, ema200_4h, ema20_d, ema50_d, ema20_15m, ema50_15m, o15m, h15m, l15m, c15m, t, updated_at: new Date().toISOString() };
@@ -84,20 +85,20 @@ router.get('/ema-current', (req, res) => res.json(state.tvEmaCache));
 // ── Agent trendline endpoints ───────────────────────────────────────────────
 router.get('/agent/trendline/candle', (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   if (!state.tvEmaCache || !state.tvEmaCache.c15m) return res.status(204).end();
   res.json({ o: state.tvEmaCache.o15m, h: state.tvEmaCache.h15m, l: state.tvEmaCache.l15m, c: state.tvEmaCache.c15m, t: state.tvEmaCache.t });
 });
 
 router.get('/agent/trendline', (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   res.json(state.trendlineState);
 });
 
 router.post('/agent/trendline/cancel', express.json(), (req, res) => {
   const secret = req.headers['x-webhook-secret'] || req.body?.secret;
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const id = req.body?.id;
   if (id != null) state.trendlineState = state.trendlineState.filter(t => t.id !== Number(id));
   else state.trendlineState = [];
@@ -108,13 +109,13 @@ router.post('/agent/trendline/cancel', express.json(), (req, res) => {
 // ── TV trendline order tracking ─────────────────────────────────────────────
 router.get('/agent/tv-tl-orders', (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   res.json(state.tvTlActiveOrders);
 });
 
 router.post('/agent/tv-tl-orders/remove', express.json(), (req, res) => {
   const secret = req.body?.secret || req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const { market_magic } = req.body || {};
   if (market_magic != null) {
     state.tvTlActiveOrders = state.tvTlActiveOrders.filter(o => o.market_magic !== Number(market_magic));
@@ -126,14 +127,14 @@ router.post('/agent/tv-tl-orders/remove', express.json(), (req, res) => {
 // ── EMA agent control ───────────────────────────────────────────────────────
 router.get('/ema/control', async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   await emaControlReady;
   res.json({ paused: state.emaAgentPaused, skipUntilCross: state.emaSkipUntilCross });
 });
 
 router.post('/ema/set-control', express.json(), (req, res) => {
   const secret = req.headers['x-webhook-secret'] || req.body?.secret;
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   if ('paused' in req.body) state.emaAgentPaused = req.body.paused === true;
   if ('skipUntilCross' in req.body) state.emaSkipUntilCross = req.body.skipUntilCross || null;
   saveAgentState();
@@ -142,7 +143,7 @@ router.post('/ema/set-control', express.json(), (req, res) => {
 
 router.get('/ema/rideopennow-pending', (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const pending = state.rideOpenPending;
   state.rideOpenPending = null;
   res.json(pending ? { direction: pending.direction, entry: pending.entry } : { direction: null });
@@ -150,7 +151,7 @@ router.get('/ema/rideopennow-pending', (req, res) => {
 
 router.get('/ema/clear-pending', (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const pending = state.emaClearPending;
   state.emaClearPending = false;
   res.json({ clear: pending });
@@ -158,7 +159,7 @@ router.get('/ema/clear-pending', (req, res) => {
 
 router.get('/ema/active-slots', async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const { data: trades, error } = await supabase.from('trades')
       .select('magic, direction, entry, sl, tp, signal_id, opened_at')
@@ -170,7 +171,7 @@ router.get('/ema/active-slots', async (req, res) => {
 
 router.get('/ema/active-ride', async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const { data: trade, error } = await supabase.from('trades')
       .select('magic, direction, entry, signal_id, opened_at')
@@ -183,7 +184,7 @@ router.get('/ema/active-ride', async (req, res) => {
 
 router.post('/agent/cancel-pending-magic', express.json(), async (req, res) => {
   const secret = req.body?.secret || req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const magic = parseInt(req.body?.magic);
   if (!magic) return res.status(400).json({ error: 'Missing or invalid magic' });
   try {

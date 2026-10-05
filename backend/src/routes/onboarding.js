@@ -12,6 +12,7 @@ import { createOnboardingToken, verifyOnboardingToken } from '../security/tokens
 import { normalizeLotSize, formatLotSize, cleanEmail, requireEmail, cleanContactHandle, formatContactLine } from '../utils/validators.js';
 import { METAAPI_PROVISIONING_BASE } from '../config.js';
 import { fetchWithTimeout } from '../utils/http.js';
+import { safeEqual } from '../security/safeEqual.js';
 
 const router = express.Router();
 
@@ -62,7 +63,7 @@ router.get('/onboarding-resume', async (req, res) => {
 // ── POST /save-telegram-id ──────────────────────────────────────────────────
 router.post('/save-telegram-id', demoGuard, express.json(), async (req, res) => {
   const secret = req.headers['x-webhook-secret'] || req.body?.secret;
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const { email: rawEmail, telegram_user_id, telegram_username, discord_username } = req.body;
     const email = requireEmail(rawEmail);
