@@ -5,6 +5,7 @@ import { state } from '../state.js';
 import { publicLimiter } from '../middleware/auth.js';
 import { metaApiFetch } from '../services/metaapi.js';
 import { vilniusParts } from '../utils/formatters.js';
+import { safeEqual } from '../security/safeEqual.js';
 
 const router = express.Router();
 
@@ -57,7 +58,7 @@ router.get('/trades/open', publicLimiter, async (req, res) => {
 // ── GET /positions/open — all open positions (for Python agent, no Supabase filter) ──
 router.get('/positions/open', async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const posRes = await metaApiFetch(
       `/users/current/accounts/${process.env.METAAPI_MASTER_ACCOUNT_ID}/positions`,

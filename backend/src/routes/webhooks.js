@@ -18,6 +18,7 @@ import { createOnboardingToken } from '../security/tokens.js';
 import { deleteCopyFactorySubscriber, deleteMetaApiAccount } from '../services/copyfactory.js';
 import { cleanEmail } from '../utils/validators.js';
 import { MAX_GENERATED_TP_LEVELS } from '../config.js';
+import { safeEqual } from '../security/safeEqual.js';
 
 async function supabaseInsertWithRetry(table, data, label = '') {
   for (let attempt = 1; attempt <= 3; attempt++) {
@@ -132,7 +133,7 @@ const router = express.Router();
 // ── POST /webhook/telegram-only ─────────────────────────────────────────────
 router.post('/webhook/telegram-only', express.text({ type: '*/*' }), async (req, res) => {
   const { text, bodySecret } = parseSecretTextPayload(req.body);
-  if (!bodySecret || bodySecret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(bodySecret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   if (!text) return res.status(400).json({ error: 'Missing text' });
 
   const chatId = process.env.TELEGRAM_CHAT_ID_XAU;
@@ -147,7 +148,7 @@ router.post('/webhook/telegram-only', express.text({ type: '*/*' }), async (req,
 // ── POST /webhook/fvg — signal alerts (market/limit, Supabase, VIP) ─────────
 router.post('/webhook/fvg', express.text({ type: '*/*' }), async (req, res) => {
   const { text, bodySecret, silent, no_msg, comment, layer, noTp } = parseSecretTextPayload(req.body);
-  if (!bodySecret || bodySecret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(bodySecret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   if (!text) { console.warn('/webhook/fvg missing text'); return res.status(400).json({ error: 'Missing text' }); }
   if (DEMO_MODE) return res.json({ ok: true, demo: true, message: 'Demo mode — no live trade executed' });
 
@@ -297,7 +298,7 @@ router.post('/webhook/fvg', express.text({ type: '*/*' }), async (req, res) => {
 // ── POST /webhook/hhhl — HHHL Structure TV alert → MetaAPI MT5 limit order ──
 router.post('/webhook/hhhl', express.json(), async (req, res) => {
   const secret = req.body?.secret;
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   if (DEMO_MODE) return res.json({ ok: true, demo: true, message: 'Demo mode — no live trade executed' });
 
   const { dir, price, pivot_time, sl_pt, tp_pt, tf } = req.body;
@@ -351,7 +352,7 @@ const MAX_GAP_TV = 50.0;
 
 router.post('/webhook/hhhl-break', express.json(), async (req, res) => {
   const secret = req.body?.secret;
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   if (DEMO_MODE) return res.json({ ok: true, demo: true, message: 'Demo mode — no live trade executed' });
 
   const { type, dir, price, tp_pt, sl_pt, tf, limit_price } = req.body;
@@ -442,7 +443,7 @@ async function _postFvgInternal(text) {
 
 router.post('/webhook/tv-tl', express.json(), async (req, res) => {
   const { secret, direction, entry, tl_value, sl_pt, tp_pt } = req.body || {};
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   if (DEMO_MODE) return res.json({ ok: true, demo: true, message: 'Demo mode — no live trade executed' });
   const dir = (direction || '').toUpperCase();
   const marketEntry = parseFloat(entry), tlVal = parseFloat(tl_value), slPt = parseFloat(sl_pt), tpPt = parseFloat(tp_pt);

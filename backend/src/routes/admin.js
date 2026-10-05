@@ -8,13 +8,14 @@ import { metaApiFetch, closeTradeByMagic, cancelOrderByMagic, getClosedDealByMag
 import { putCopyFactorySubscriber, deleteCopyFactorySubscriber, deleteMetaApiAccount, detectGoldSymbol } from '../services/copyfactory.js';
 import { cleanEmail, normalizeLotSize, formatLotSize, formatAllowedLotSizes } from '../utils/validators.js';
 import { genHhhlSignalId, nowVilnius, isMetaApiTradeSuccess } from '../utils/formatters.js';
+import { safeEqual } from '../security/safeEqual.js';
 
 const router = express.Router();
 
 // ── POST /admin/update-subscriber-lot ───────────────────────────────────────
 router.post('/admin/update-subscriber-lot', express.json(), async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const { email: rawEmail, lot_size } = req.body;
   if (!rawEmail || lot_size == null) return res.status(400).json({ error: 'email and lot_size required' });
   const email = cleanEmail(rawEmail);
@@ -36,7 +37,7 @@ router.post('/admin/update-subscriber-lot', express.json(), async (req, res) => 
 // ── GET /admin/client-status ─────────────────────────────────────────────────
 router.get('/admin/client-status', async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const email = String(req.query.email || '').trim().toLowerCase();
   if (!email) return res.status(400).json({ error: 'email required' });
   const { data: client, error } = await supabase.from('clients').select('*').eq('email', email).single();
@@ -52,7 +53,7 @@ router.get('/admin/client-status', async (req, res) => {
 // ── GET /admin/subscriber-logs ───────────────────────────────────────────────
 router.get('/admin/subscriber-logs', async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const email = String(req.query.email || '').trim().toLowerCase();
   if (!email) return res.status(400).json({ error: 'email required' });
   const { data: client, error } = await supabase.from('clients').select('metaapi_account_id').eq('email', email).single();
@@ -72,7 +73,7 @@ router.get('/admin/subscriber-logs', async (req, res) => {
 // ── GET /admin/copyfactory-log ───────────────────────────────────────────────
 router.get('/admin/copyfactory-log', async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const email = String(req.query.email || '').trim().toLowerCase();
   if (!email) return res.status(400).json({ error: 'email required' });
   const { data: client, error } = await supabase.from('clients').select('metaapi_account_id').eq('email', email).single();
@@ -88,7 +89,7 @@ router.get('/admin/copyfactory-log', async (req, res) => {
 // ── POST /admin/update-subscriber-symbol ────────────────────────────────────
 router.post('/admin/update-subscriber-symbol', express.json(), async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   const { email: rawEmail, broker_symbol } = req.body;
   if (!rawEmail) return res.status(400).json({ error: 'email required' });
   const email = cleanEmail(rawEmail);
@@ -111,7 +112,7 @@ router.post('/admin/update-subscriber-symbol', express.json(), async (req, res) 
 // ── POST /telegram-webhook — Telegram bot commands ───────────────────────────
 router.post('/telegram-webhook', demoGuard, express.json(), async (req, res) => {
   try {
-    if (process.env.TELEGRAM_WEBHOOK_SECRET && req.headers['x-telegram-bot-api-secret-token'] !== process.env.TELEGRAM_WEBHOOK_SECRET) {
+    if (process.env.TELEGRAM_WEBHOOK_SECRET && !safeEqual(req.headers['x-telegram-bot-api-secret-token'], process.env.TELEGRAM_WEBHOOK_SECRET)) {
       return res.status(401).json({ ok: false });
     }
     const message = req.body?.message;

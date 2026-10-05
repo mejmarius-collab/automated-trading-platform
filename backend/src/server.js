@@ -16,6 +16,7 @@ import onboardingRouter from './routes/onboarding.js';
 import tradesRouter from './routes/trades.js';
 import agentRouter from './routes/agent.js';
 import adminRouter from './routes/admin.js';
+import { safeEqual } from './security/safeEqual.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -132,7 +133,7 @@ app.use(adminRouter);
 // ── GET /orders/pending ───────────────────────────────────────────────────────
 app.get('/orders/pending', async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const { metaApiFetch } = await import('./services/metaapi.js');
     const ordersRes = await metaApiFetch(`/users/current/accounts/${process.env.METAAPI_MASTER_ACCOUNT_ID}/orders`, { headers: { 'auth-token': process.env.METAAPI_TOKEN } });
@@ -145,7 +146,7 @@ app.get('/orders/pending', async (req, res) => {
 // ── GET /price/internal ───────────────────────────────────────────────────────
 app.get('/price/internal', async (req, res) => {
   const secret = req.headers['x-webhook-secret'];
-  if (!secret || secret !== process.env.WEBHOOK_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  if (!safeEqual(secret, process.env.WEBHOOK_SECRET)) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const now = Date.now();
     if (state.priceCache && now - state.priceCacheTime < 10_000) return res.json(state.priceCache);
